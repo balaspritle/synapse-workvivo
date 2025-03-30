@@ -1,9 +1,9 @@
-from fastapi import FastAPI, Request, HTTPException
-import requests, os
+from fastapi import FastAPI, Request
+import requests, os, json
 
 app = FastAPI()
 
-WORKVIVO_API_URL = "https://api.workvivo.com/v1/chat/bots/message"
+WORKVIVO_API_URL = os.getenv("WORKVIVO_API_URL")
 WORKVIVO_ID = os.getenv("WORKVIVO_ID")  # Set in env variables
 WORKVIVO_TOKEN = os.getenv("WORKVIVO_TOKEN")  # Bearer token
 
@@ -12,16 +12,21 @@ def send_message(bot_userid: str, channel_url: str, message_type: str, payload: 
     """
     Sends a message to Workvivo via the bot API with authentication.
     """
-    headers = {
-        "Authorization": f"Bearer {WORKVIVO_TOKEN}",
-        "Workvivo-Id": WORKVIVO_ID,
+    headersList = {
+        "Accept": "*/*", 
         "Accept": "application/json",
-        "Content-Type": "application/json",
+        "Workvivo-Id": WORKVIVO_ID,
+        "Authorization": f"Bearer {WORKVIVO_TOKEN}",
+        "Content-Type": "application/json" 
     }
-
+    
     payload.update({"bot_userid": bot_userid, "channel_url": channel_url, "type": message_type})
+    
+    response = requests.request("POST", WORKVIVO_API_URL, data=json.dumps(payload), headers=headersList)
+    print("response", response, response.json())
+    print("headersList", headersList)
+    print("payload", payload)
 
-    response = requests.post(WORKVIVO_API_URL, headers=headers, json=payload)
     return response.json()
 
 
@@ -36,15 +41,13 @@ async def webhook(request: Request):
     Workvivo webhook that listens for messages and responds accordingly.
     """
     payload = await request.json()
+
     print("Incoming payload >>>", payload)
-    sender_id = payload.get("sender", {}).get("id")
-    text = payload.get("message", {}).get("text", "")
-    channel_url = payload.get("channel", {}).get("url", "")
 
-    if not sender_id or not text or not channel_url:
-        raise HTTPException(status_code=400, detail="Invalid payload")
-
-    bot_userid = "bot_user_id"  # Replace with your bot's user ID
+    bot_userid = payload.get("message", {}).get("bot_userid")
+    text = payload.get("message", {}).get("message", "")
+    channel_url = payload.get("message", {}).get("channel_url", "")
+    print(bot_userid, text, channel_url)
 
     if text == "1":
         response = send_message(bot_userid, channel_url, "message", {"message": "Hello World"})
@@ -54,7 +57,7 @@ async def webhook(request: Request):
             "replies": [
                 {"label": "Unable to connect to this network", "message": "Unable to connect to this network"},
                 {"label": "Incorrect Password", "message": "Incorrect Password"},
-                {"label": "No error message, just won’t connect", "message": "No error message, just won’t connect"},
+                {"label": "No error message, just won't connect", "message": "No error message, just won't connect"},
                 {"label": "Other", "message": "Other"}
             ]
         })
