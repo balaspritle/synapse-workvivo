@@ -2,8 +2,16 @@ version: 1.0
 runtime: python3
 build:
   commands:
-    - pip install -r requirements.txt
+    build:
+      - pip install -r requirements.txt
 run:
-  command: uvicorn main:app --host 0.0.0.0 --port 8080
+  runtime-version: 3.11
+  command: gunicorn --bind 0.0.0.0:8080 app:app
   network:
     port: 8080
+    env: APP_PORT
+  env:
+    - name: FLASK_ENV
+      value: production
+    - name: PYTHONPATH
+      value: /app

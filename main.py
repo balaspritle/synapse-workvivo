@@ -1,5 +1,7 @@
 from fastapi import FastAPI, Request
 import requests, os, json
+from dotenv import load_dotenv
+load_dotenv(dotenv_path='.env')
 
 app = FastAPI()
 
@@ -80,5 +82,5 @@ async def webhook(request: Request):
 
     else:
         response = send_message(bot_userid, channel_url, "message", {"message": f"Echo: {text}"})
-
+    print(response, "%%%%")
     return response

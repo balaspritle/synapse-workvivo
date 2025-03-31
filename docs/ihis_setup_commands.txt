@@ -1,0 +1,39 @@
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+. ~/.nvm/nvm.sh
+nvm install v16.6.1
+sudo apt update
+sudo apt install software-properties-common
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt install python3.8
+python3.8 --version
+sudo apt-get upgrade
+git clone https://github.com/Zevigo-Solutions/titan.git
+cd titan
+git remote set-url origin https://balaspritle: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@github.com/Zevigo-Solutions/titan.git
+sudo apt install python3-pip
+pip3 install -r requirements.txt 
+sudo apt install awscli
+aws configure >> access_key_id, secret_access_key
+cd utility
+sudo vim config.py  >> Change prod or dev flag
+cd ..
+python3 app.py 
+sudo apt install nginx
+cd /etc/nginx/sites-enabled
+ls
+sudo rm -r default 
+sudo vim ihis.conf
+sudo service nginx restart
+npm install pm2 -g
+pm2 start app.py --interpreter python3
+pm2 startup
+sudo env PATH=$PATH:/home/ubuntu/.nvm/versions/node/v16.6.1/bin /home/ubuntu/.nvm/versions/node/v16.6.1/lib/node_modules/pm2/bin/pm2 startup systemd -u ubuntu --hp /home/ubuntu
+pm2 save
+pm2 logs
+sudo apt install snapd
+sudo snap install hello-world
+sudo snap install core; sudo snap refresh core
+sudo snap install --classic certbot
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
+sudo certbot --nginx
+sudo certbot renew --dry-run
