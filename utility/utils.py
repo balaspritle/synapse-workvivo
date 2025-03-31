@@ -1,4 +1,4 @@
-import utility.config as config, utility.azure_bot as azure_bot #, utility.mail_service as mail_service, utility.db_utils as db_utils
+import utility.config as config, utility.azure_bot as azure_bot, utility.db_utils as db_utils #, utility.mail_service as mail_service,
 from utility.datastructures import WORKVIVO_FORMATTER, DATA_COLLECTOR
 import requests, random, datetime, pytz, time, os, json, ast
 import numpy as np
@@ -14,7 +14,7 @@ GAME_MODE = ast.literal_eval(os.getenv("GAME_MODE"))
 ## GAMEPLAY
 if GAME_MODE:
     print("GAME MODE IS ON")
-    # import utility.gameplay as gameplay
+    import utility.gameplay as gameplay
     gameplay_users_holder = {}
 
 wf_format = WORKVIVO_FORMATTER()
@@ -91,7 +91,7 @@ def handling_user_comments(sender, message):
         return True ## Message handled here
     return False ## Message not handled here
 
-def game_redirection(sender, message):
+def game_redirection(bot_userid, channel_url, sender, message):
     response = False
     
     try:
@@ -102,14 +102,14 @@ def game_redirection(sender, message):
         
         print(">>>>>", gameplay_users_holder[sender].user_gameplay_stats)
         if message in gameplay_users_holder[sender].gameplay_secret_keyword + gameplay_users_holder[sender].gameplay_trigger_keyword:
-            response = gameplay_users_holder[sender].gameResponseMain(sender, message)
+            response = gameplay_users_holder[sender].gameResponseMain(bot_userid, channel_url, sender, message)
             
         elif message.startswith(gameplay_users_holder[sender].gamplay_correct_answer_prompt) or message.startswith(gameplay_users_holder[sender].gamplay_wrong_answer_prompt):
-            response = gameplay_users_holder[sender].gameResponseMain(sender, message)
+            response = gameplay_users_holder[sender].gameResponseMain(bot_userid, channel_url, sender, message)
 
         elif gameplay_users_holder[sender].user_gameplay_stats != {}:
-            send_message_v2(sender, wf_format.message_format(random.choice(["Oh that's incorrect. Your game score will be submitted for the contest."])))
-            send_message_v2(sender, wf_format.message_format("Would you like to play again ?"))
+            send_message_v2(bot_userid, channel_url, wf_format.message_format(random.choice(["Oh that's incorrect. Your game score will be submitted for the contest."])))
+            send_message_v2(bot_userid, channel_url, wf_format.message_format("Would you like to play again ?"))
             gameplay_users_holder[sender].over_and_out(sender)
             gameplay_users_holder[sender].game_initialization(sender, "sample message", override = True)
             response = True
@@ -122,7 +122,7 @@ def game_redirection(sender, message):
     except Exception as e:
         print("Error in >>>>>>>> game_redirection", e)
 
-def redirection(sender, message):
+def redirection(bot_userid, channel_url, sender, message):
     
     if config.debug:
         print("sender : {}, message ---> {} \n".format(sender, message))
@@ -141,7 +141,7 @@ def redirection(sender, message):
     
     if message in special_messages:
         if message in special_messages[-3:]: ## If the user is manually typing No, no, then handle here ##
-            send_message_v2(sender, wf_format.message_format(random.choice(config.default_fallback_answer)))
+            send_message_v2(bot_userid, channel_url, sender, wf_format.message_format(random.choice(config.default_fallback_answer)))
             return True
         try:
             users_not_satisfied[sender] += 1
@@ -166,8 +166,8 @@ def redirection(sender, message):
             hr_email_flag_1 = find_three_consecutive_no(users_chat_data_holder[sender].__dict__['chat_log'])
             
             if hr_email_flag_1:
-                send_message_v2(sender, wf_format.message_format(random.choice(config.default_no_flow_message)))
-                send_message_v2(sender, wf_format.message_format(random.choice(config.default_mail_flow_final_message)))
+                send_message_v2(bot_userid, channel_url, sender, wf_format.message_format(random.choice(config.default_no_flow_message)))
+                send_message_v2(bot_userid, channel_url, sender, wf_format.message_format(random.choice(config.default_mail_flow_final_message)))
                 user_data = [users_chat_data_holder[sender].__dict__] ## ASync Email Push
                 with concurrent.futures.ThreadPoolExecutor() as executor: 
                     futures = executor.map(push_mail, user_data)
@@ -179,11 +179,11 @@ def redirection(sender, message):
             else:
                 # Track for the user comments again ##
                 users_not_satisfied[sender] -= 1
-                send_message_v2(sender, wf_format.message_format(random.choice(config.default_fallback_answer)))
+                send_message_v2(bot_userid, channel_url, sender, wf_format.message_format(random.choice(config.default_fallback_answer)))
                 
             return True ## Message handled here
         else:
-            send_message_v2(sender, wf_format.message_format(random.choice(config.default_fallback_answer)))
+            send_message_v2(bot_userid, channel_url, sender, wf_format.message_format(random.choice(config.default_fallback_answer)))
             return True
     
     return False
@@ -193,9 +193,12 @@ def respond(bot_userid, channel_url, sender, message):
     """Formulate a response to the user and
     pass it on to a function that sends it."""
     if GAME_MODE:
-        game_redirection_flag = game_redirection(sender, message)
+        game_redirection_flag = game_redirection(bot_userid, channel_url, sender, message)
         if game_redirection_flag:
             return
+    if ECHO_BOT:
+        response = send_message_v2(bot_userid, channel_url, sender, wf_format.message_format(f"Echo : {message}"))
+        return response
         
     if sender in list(users_chat_data_holder.keys()):
         pass ## If the user is already there, then we can just continue ##
@@ -205,7 +208,7 @@ def respond(bot_userid, channel_url, sender, message):
     user_chat_timestamp = str(datetime.datetime.strftime(datetime.datetime.now(pytz.timezone('Asia/Singapore')), "%Y-%m-%d %H:%M:%S"))
     users_chat_data_holder[sender].store_logs(sender, user_chat_timestamp + " - User : " + message) ## Log user's message ##
     
-    # redirect_flag = redirection(sender, message) ## Redirection happens here ##
+    # redirect_flag = redirection(bot_userid, channel_url, sender, message) ## Redirection happens here ##
     redirect_flag = False
 
     if redirect_flag:
@@ -217,7 +220,6 @@ def respond(bot_userid, channel_url, sender, message):
         messages, prompts, images, files, did_i_answer_your_question_flag = formatted_response.messages, formatted_response.prompts, formatted_response.images,  formatted_response.files,  formatted_response.did_i_answer_your_question_flag
         if config.debug:
             print("messages, prompts, images, did_i_answer_your_question_flag", messages, prompts, images, did_i_answer_your_question_flag, "\n")
-            print(images, "images")
         if messages:
             response = send_message_v2(bot_userid, channel_url, sender, messages)
             if not images and not files and did_i_answer_your_question_flag:did_i_answer_your_question(bot_userid, channel_url, sender)
@@ -408,20 +410,6 @@ def send_message_v2(bot_userid, channel_url, recipient_id, message_payload, save
         except KeyError:
             pass
         
-    return response.json()
-
-def send_message_v3(recipient_id, message_payload):
-    ## Quick Replies Format
-    payload = {
-        'message': message_payload,
-        'recipient': {
-            'id': recipient_id
-        },
-        'messaging_type': 'RESPONSE'
-    }
-    auth = {'access_token': PAGE_ACCESS_TOKEN}
-    response = requests.post(FB_API_URL, params=auth, json=payload)
-            
     return response.json()
 
 def did_i_answer_your_question(bot_userid, channel_url, sender):

@@ -1,17 +1,17 @@
 import random, pytz, requests, json, os, string
 from datetime import datetime
-import utility.config as config
 from utility.datastructures import WORKVIVO_FORMATTER
-import utility.fb_workplace as fb_workplace
+from utility.workvivo import get_user_data
 import utility.db_utils as db_utils
 
 alphabets_mapper = {index : item for index, item in enumerate(list(string.ascii_uppercase))}
 
 wf_format = WORKVIVO_FORMATTER()
 
-FB_API_URL = config.graph_api + config._url
-VERIFY_TOKEN = config.server_token
-PAGE_ACCESS_TOKEN = config.access_token
+WORKVIVO_API_URL = os.getenv("WORKVIVO_API_URL")
+WORKVIVO_ID = os.getenv("WORKVIVO_ID")
+WORKVIVO_TOKEN = os.getenv("WORKVIVO_TOKEN")
+headersList = {"Accept": "*/*",  "Accept": "application/json", "Workvivo-Id": WORKVIVO_ID, "Authorization": f"Bearer {WORKVIVO_TOKEN}","Content-Type": "application/json"}
     
 ## Load the EXCEL sheet to JSON
 def excel_to_json():
@@ -50,36 +50,20 @@ def excel_to_json():
 
 quiz_json_path = excel_to_json()
 
-def send_message_v2(recipient_id, message_payload):
-    payload = {
-        'message': message_payload,
-        'recipient': {
-            'id': recipient_id
-        },
-        'notification_type': 'regular'
+def send_message_v2(bot_userid, channel_url, message_payload):
+    payload_part_1 = {
+        "bot_userid" : bot_userid,
+        "channel_url" : channel_url
     }
-    auth = {'access_token': PAGE_ACCESS_TOKEN}
-    response = requests.post(FB_API_URL, params=auth, json=payload)
-    return response.json()
-
-def send_message_v3(recipient_id, message_payload):
-    ## Quick Replies Format
-    payload = {
-        'message': message_payload,
-        'recipient': {
-            'id': recipient_id
-        },
-        'messaging_type': 'RESPONSE'
-    }
-    auth = {'access_token': PAGE_ACCESS_TOKEN}
-    response = requests.post(FB_API_URL, params=auth, json=payload)
-            
+    payload_part_2 = message_payload
+    print("Composed Payload >>>", payload_part_1 | payload_part_2)
+    response = requests.request("POST", WORKVIVO_API_URL, data=json.dumps(payload_part_1 | payload_part_2), headers=headersList)
     return response.json()
 
 class scorer:
   def __init__(self, user_id, total_questions_count):
     self.lot = list(range(1, total_questions_count + 1))
-    self.user_data = fb_workplace.get_user_data(user_id)
+    self.user_data = get_user_data(user_id)
     self.question_id = []
     self.questions = []
     self.actual_answers = []
@@ -144,19 +128,27 @@ class gamezone:
       except KeyError as e:
           return False
 
-  def game_initialization(self, user_id, message, override = False):
+  def game_initialization(self, bot_userid, channel_url, user_id, message, override = False):
     if message in self.gameplay_secret_keyword or override:
       
       if not override:
-        message_1 = "Welcome to the Ultimate HCM Quiz! \n You only have 1 chance to *select* the right answers to each questions. Game ends when you run out of stamina for correct answers (or when you type a message). *Remember only your first five attempts* at the game will be taken into account for the contest. For full T&Cs, click on the link below."
-        send_message_v2(user_id, wf_format.message_format(random.choice([message_1])))
+        message_1 = "Welcome to the Ultimate HCM Quiz! \n You only have 1 chance to *select* the right answers to each questions. Game ends when you run out of stamina for correct answers (or when you type a message). *Remember only your first five attempts* at the game will be taken into account for the contest. For full T&Cs, click on the link below. Shall we start ?"
+        send_message_v2(bot_userid, channel_url, wf_format.message_format(random.choice([message_1])))
 
       game_starter_prompt = {
-          "text" : "Shall we start ?",
-          "quick_replies" : [{"content_type":"text", "title":"Click to start the game!", "payload": random.choice(self.gameplay_trigger_keyword), "image_url" : "https://wallpaperaccess.com/full/1429574.jpg"}, 
-                             {"content_type":"text", "title":"No, maybe later", "payload":"Hi", "image_url" : "https://i.imgur.com/aN0RMk4.png"}]
+        "type": "quick_reply",
+        "replies": [
+          {
+            "label": "Click to start the game!",
+            "message": random.choice(self.gameplay_trigger_keyword)
+          },
+          {
+            "label": "No, maybe later",
+            "message": "Hi"
           }
-      send_message_v3(user_id, game_starter_prompt)
+        ]
+      }
+      send_message_v2(bot_userid, channel_url, game_starter_prompt)
       
       if not override:
         self.over_and_out(user_id)
@@ -178,9 +170,9 @@ class gamezone:
         self.latest_question_answer = option_ + " : " + str(prompt["answer"])
       else:
         payload = self.gamplay_wrong_answer_prompt
-      quick_replies.append({"content_type":"text", "title": option_, "payload": payload + option_})
+      quick_replies.append({"label": option_, "message": payload + option_})
 
-    return {"text" : question, "quick_replies" : quick_replies}
+    return wf_format.message_format(question), {"type": "quick_reply", "replies" : quick_replies}
 
   def save_game_log(self, user_id):
     # print("USER CURRENT STATUS - {} & {}".format(user_id, self.user_gameplay_stats[user_id].__dict__))
@@ -191,26 +183,27 @@ class gamezone:
     
     db_utils.insert_data_into_db_save_game_log(datestamp, timestamp, holder['user_data']['id'], len(holder['scores']))
 
-  def game_triggered(self, user_id, message):
+  def game_triggered(self, bot_userid, channel_url, user_id, message):
     if message in self.gameplay_trigger_keyword:
       self.user_history.append(user_id)
       message_2 = "This is your {} attempt".format(self.make_ordinal(self.user_history.count(user_id)))
       message_3 = "Yes, let's play!"
-      send_message_v2(user_id, wf_format.message_format(random.choice([message_2])))
-      send_message_v2(user_id, wf_format.message_format(random.choice([message_3])))
+      send_message_v2(bot_userid, channel_url, wf_format.message_format(random.choice([message_2])))
+      send_message_v2(bot_userid, channel_url, wf_format.message_format(random.choice([message_3])))
 
       ## Record the user's gameplay here
       self.user_gameplay_stats[user_id] = scorer(user_id, len(self.qna_pair))
 
       ## Generate Question Format
-      first_qna = self.game_question_generator(self.qna_pair["1"])
-      send_message_v3(user_id, first_qna)
+      text, options = self.game_question_generator(self.qna_pair["1"])
+      send_message_v2(bot_userid, channel_url, text)
+      send_message_v2(bot_userid, channel_url, options)
       self.user_gameplay_stats[user_id].first_half(self.qna_pair["1"]["question"], 1, self.qna_pair["1"]["answer"])
       return True
     return False
 
-  def game_handler(self, user_id, message):
-    print("game_handler >>>", user_id, message)
+  def game_handler(self, bot_userid, channel_url, user_id, message):
+    print("game_handler >>>", bot_userid, channel_url, user_id, message)
     if message.startswith(self.gamplay_correct_answer_prompt):
 
       ## Record his score
@@ -218,38 +211,39 @@ class gamezone:
 
       ## Start generating his next questions      
       try:
-        send_message_v2(user_id, wf_format.message_format(random.choice(self.encourage_prompts)))
+        send_message_v2(bot_userid, channel_url, wf_format.message_format(random.choice(self.encourage_prompts)))
         next_question_id = str(random.choice(self.user_gameplay_stats[user_id].lot))
-        next_qna = self.game_question_generator(self.qna_pair[next_question_id])
-        send_message_v3(user_id, next_qna)
+        text, options  = self.game_question_generator(self.qna_pair[next_question_id])
+        send_message_v2(bot_userid, channel_url, text)
+        send_message_v2(bot_userid, channel_url, options)
         self.user_gameplay_stats[user_id].first_half(self.qna_pair[next_question_id]["question"], int(next_question_id), self.qna_pair[next_question_id]["answer"])
       except IndexError as e:
         ## User has answered all the questions correctly ##
-        send_message_v2(user_id, wf_format.message_format(random.choice(["That's phenomenal !!!, you have answered all the questions !!!"])))
+        send_message_v2(bot_userid, channel_url, wf_format.message_format(random.choice(["That's phenomenal !!!, you have answered all the questions !!!"])))
         self.over_and_out(user_id)
       return True
     elif message.startswith(self.gamplay_wrong_answer_prompt):
-      send_message_v2(user_id, wf_format.message_format(random.choice([self.submission_message])))
-      send_message_v2(user_id, wf_format.message_format(random.choice(["The correct answer is " +  "*" + self.latest_question_answer + "*" ])))
-      send_message_v2(user_id, wf_format.message_format("Would you like to play again ?"))
+      send_message_v2(bot_userid, channel_url, wf_format.message_format(random.choice([self.submission_message])))
+      send_message_v2(bot_userid, channel_url, wf_format.message_format(random.choice(["The correct answer is " +  "*" + self.latest_question_answer + "*" ])))
+      send_message_v2(bot_userid, channel_url, wf_format.message_format("Would you like to play again ?"))
       self.over_and_out(user_id)
-      self.game_initialization(user_id, "sample message", override = True)
+      self.game_initialization(bot_userid, channel_url, user_id, "sample message", override = True)
       return True
     else:
       return False
 
-  def gameResponseMain(self, user_id, message):
+  def gameResponseMain(self, bot_userid, channel_url, user_id, message):
       
     ## Game init
-    if self.game_initialization(user_id, message):
+    if self.game_initialization(bot_userid, channel_url, user_id, message):
       return True   
     
     ## Request game start permission
-    if self.game_triggered(user_id, message):
+    if self.game_triggered(bot_userid, channel_url, user_id, message):
       return True
     
     ## Continue question cycles
-    if self.game_handler(user_id, message):
+    if self.game_handler(bot_userid, channel_url, user_id, message):
       return True
     
     return False

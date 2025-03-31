@@ -8,10 +8,10 @@ def date2str_v2(row):
     processed_date = parser.parse(str(row['timestamp']))
     return processed_date.strftime('%Y-%m-%d')
 
-tenant_id = "8d09e77a-a159-4d16-a7d4-83ffd87a4018"
-client_id = "70f438b0-f78d-438d-a5f4-f611578251bf"
-client_secret = "z~S8Q~yvySoQBmFLF3KrdtlW1pcCnq26I_sdTa70"
-workspace_id = "2678d7bd-7e71-4e15-9732-3c98e3c8b456"
+tenant_id = os.getenv("TENANT_ID")
+client_id = os.getenv("CLIENT_ID")
+client_secret = os.getenv("CLIENT_SECRET")
+workspace_id = os.getenv("WORKSPACE_ID")
 kb_id = os.getenv("AZURE_BOT_URL").split("projectName=")[-1].split('&')[0]
 
 query = """
