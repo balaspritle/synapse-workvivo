@@ -199,7 +199,7 @@ class gamezone:
       send_message_v2(bot_userid, channel_url, text)
       send_message_v2(bot_userid, channel_url, options)
       self.user_gameplay_stats[user_id].first_half(self.qna_pair["1"]["question"], 1, self.qna_pair["1"]["answer"])
-      return True
+      return {"status": "ok"}
     return False
 
   def game_handler(self, bot_userid, channel_url, user_id, message):
@@ -221,14 +221,14 @@ class gamezone:
         ## User has answered all the questions correctly ##
         send_message_v2(bot_userid, channel_url, wf_format.message_format(random.choice(["That's phenomenal !!!, you have answered all the questions !!!"])))
         self.over_and_out(user_id)
-      return True
+      return {"status": "ok"}
     elif message.startswith(self.gamplay_wrong_answer_prompt):
       send_message_v2(bot_userid, channel_url, wf_format.message_format(random.choice([self.submission_message])))
       send_message_v2(bot_userid, channel_url, wf_format.message_format(random.choice(["The correct answer is " +  "*" + self.latest_question_answer + "*" ])))
       send_message_v2(bot_userid, channel_url, wf_format.message_format("Would you like to play again ?"))
       self.over_and_out(user_id)
       self.game_initialization(bot_userid, channel_url, user_id, "sample message", override = True)
-      return True
+      return {"status": "ok"}
     else:
       return False
 
@@ -236,14 +236,14 @@ class gamezone:
       
     ## Game init
     if self.game_initialization(bot_userid, channel_url, user_id, message):
-      return True   
+      return {"status": "ok"}   
     
     ## Request game start permission
     if self.game_triggered(bot_userid, channel_url, user_id, message):
-      return True
+      return {"status": "ok"}
     
     ## Continue question cycles
     if self.game_handler(bot_userid, channel_url, user_id, message):
-      return True
+      return {"status": "ok"}
     
     return False

@@ -50,7 +50,7 @@ class WORKVIVO_FORMATTER:
         """
         generic_replies - https://developers.facebook.com/docs/messenger-platform/send-messages/template/generic/#example_request
         """
-        for prompt in enumerate(prompts):
+        for index, prompt in enumerate(prompts):
           buttons.append({"message":str(prompt),"label":str(prompt)})
         
         if len(buttons) > 10:

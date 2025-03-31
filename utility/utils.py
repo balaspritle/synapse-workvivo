@@ -195,7 +195,7 @@ def respond(bot_userid, channel_url, sender, message):
     if GAME_MODE:
         game_redirection_flag = game_redirection(bot_userid, channel_url, sender, message)
         if game_redirection_flag:
-            return
+            return {"status": "ok"}
     if ECHO_BOT:
         response = send_message_v2(bot_userid, channel_url, sender, wf_format.message_format(f"Echo : {message}"))
         return response
