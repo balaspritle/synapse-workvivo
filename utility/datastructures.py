@@ -27,6 +27,7 @@ class WORKVIVO_FORMATTER:
     return False
 
   def prompt_messages_format(self, prompt_messages, prompts): 
+    print("prompt_messages", prompt_messages, prompts)
     if prompt_messages or prompts:
       complete_message = ""
       buttons = []
@@ -41,15 +42,12 @@ class WORKVIVO_FORMATTER:
         if prompts == ['ZEVIGOSOLUTIONSSEY', 'ZEVIGOSOLUTIONSON']:
           mapper = {'ZEVIGOSOLUTIONSSEY':'Yes', 'ZEVIGOSOLUTIONSON':'No'}
           buttons = [{"label":mapper[str(prompt)],"message":str(prompt)} for prompt in prompts]
-          return {"type": "card", "cards": [{"cardTitle": complete_message, "cardDescription": "", "cardImage": "-", "buttons": buttons}]}
-        else:
-          buttons = [{"label":str(prompt),"message":str(prompt)} for prompt in prompts ]
-          return {"type": "card", "cards": [{"cardTitle": complete_message, "cardDescription": "", "cardImage": "-", "buttons": buttons}]}
+          return {"type": "card", "cards": [{"cardTitle": complete_message, "cardDescription": "", "cardImage": "", "buttons": buttons}]}
+        # else:
+        #   buttons = [{"label":str(prompt),"message":str(prompt)} for prompt in prompts ]
+        #   return {"type": "card", "cards": [{"cardTitle": complete_message, "cardDescription": "", "cardImage": "", "buttons": buttons}]}
       
       elif(generic_replies.__eq__(True)):
-        """
-        generic_replies - https://developers.facebook.com/docs/messenger-platform/send-messages/template/generic/#example_request
-        """
         for index, prompt in enumerate(prompts):
           buttons.append({"message":str(prompt),"label":str(prompt)})
         

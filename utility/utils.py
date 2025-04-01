@@ -30,11 +30,11 @@ special_messages = config.default_fallback_question + ['DIAYQ-NO', 'No', 'no', '
 holder = namedtuple('holder', 'messages prompts images files did_i_answer_your_question_flag')
 headersList = {"Accept": "*/*",  "Accept": "application/json", "Workvivo-Id": WORKVIVO_ID, "Authorization": f"Bearer {WORKVIVO_TOKEN}","Content-Type": "application/json"}
 
-def handling_emails(sender, message):
+def handling_emails(bot_userid, channel_url, sender, message):
     if(email_trace in message):
-        send_message_v2(sender, wf_format.message_format(random.choice(config.default_mail_sent_message)))
+        send_message_v2(bot_userid, channel_url, sender, wf_format.message_format(random.choice(config.default_mail_sent_message)))
         local_prompts = {'attachment': {'type': 'template', 'payload': {'template_type': 'button', 'text': 'Great! Is there anything else I can help you with today ?', 'buttons': [{'type': 'postback', 'title': 'Yes', 'payload': 'ZEVIGOSOLUTIONSSEY'}, {'type': 'postback', 'title': 'No', 'payload': 'ZEVIGOSOLUTIONSON'}]}}}
-        send_message_v2(sender, local_prompts)
+        send_message_v2(bot_userid, channel_url, sender, local_prompts)
         
         ## Send An Email Here based on the attachment_id ##
         mail_data = [{'sender_id': sender, 'attachment_id': message.split(email_trace)[-1]}] ## ASync Email Push
@@ -44,26 +44,26 @@ def handling_emails(sender, message):
         return True ## Message handled here 
     return False ## Message not handled here
     
-def handling_new_hires(sender, message):
+def handling_new_hires(bot_userid, channel_url, sender, message):
     if(list(new_hire_trace.keys())[0] == message):
         buttons, buttons_holder = [], []
         buttons.append({"type":"postback","title":"yes","payload":"How do I claim for my medical/dental expenses?"})
         buttons.append({"type":"postback","title":"no","payload":"ZEVIGOSOLUTIONSNHIRENO2"})
         buttons_holder.append({"title": list(new_hire_trace.values())[0], "buttons":buttons})
-        send_message_v2(sender, {"attachment":{"type":"template","payload":{"template_type":"generic", "elements": buttons_holder}}})  
+        send_message_v2(bot_userid, channel_url, sender, {"attachment":{"type":"template","payload":{"template_type":"generic", "elements": buttons_holder}}})  
         return True ## Message handled here 
     elif(list(new_hire_trace.keys())[1] == message):
-        send_message_v2(sender, wf_format.message_format(list(new_hire_trace.values())[1])) 
+        send_message_v2(bot_userid, channel_url, sender, wf_format.message_format(list(new_hire_trace.values())[1])) 
         return True ## Message handled here 
     return False ## Message not handled here
 
-def handling_numbers(sender, message):
+def handling_numbers(bot_userid, channel_url, sender, message):
     try:
         if isinstance(int(message), int):
             hr_email_flag_3 = find_three_consecutive_not_found(users_chat_data_holder[sender].__dict__['chat_log'])
             if hr_email_flag_3:
-                send_message_v2(sender, wf_format.message_format(random.choice(config.default_no_flow_message)))
-                send_message_v2(sender, wf_format.message_format(random.choice(config.default_mail_flow_final_message)))
+                send_message_v2(bot_userid, channel_url, sender, wf_format.message_format(random.choice(config.default_no_flow_message)))
+                send_message_v2(bot_userid, channel_url, sender, wf_format.message_format(random.choice(config.default_mail_flow_final_message)))
                 user_data = [users_chat_data_holder[sender].__dict__] ## ASync Email Push
                 with concurrent.futures.ThreadPoolExecutor() as executor: 
                     futures = executor.map(push_mail, user_data)
@@ -75,7 +75,7 @@ def handling_numbers(sender, message):
     except ValueError as e:
         return False ## Message not handled here
 
-def handling_user_comments(sender, message):
+def handling_user_comments(bot_userid, channel_url, sender, message):
     if sender in list(users_comments_collector.keys()):
         user_feedback_rating = users_chat_data_holder[sender].__dict__['chat_log'][-3]
         users_comments_collector[sender] = message ## User comments collection happens here
@@ -83,7 +83,7 @@ def handling_user_comments(sender, message):
             print("user comment >>>>>>>>", users_comments_collector[sender], user_feedback_rating)
         # push_mail(sender, "USER COMMENT AND RATING", " User Comment :" + users_comments_collector[sender] + ", Feedback Rating :" +str(user_feedback_rating))
         collect_comments_and_rating(sender, users_comments_collector[sender], user_feedback_rating)
-        send_message_v2(sender, wf_format.message_format(random.choice(config.default_comments_response_message)))
+        send_message_v2(bot_userid, channel_url, sender, wf_format.message_format(random.choice(config.default_comments_response_message)))
         
         ## PUSH AN EMAIL HERE WITH THE COMMENT DATA ##
         del users_comments_collector[sender] ## Remove the user from the loop ##
@@ -127,22 +127,22 @@ def redirection(bot_userid, channel_url, sender, message):
     if config.debug:
         print("sender : {}, message ---> {} \n".format(sender, message))
     
-    if handling_emails(sender, message):
-        return {"status": "ok"} ## Message handled here            
+    if handling_emails(bot_userid, channel_url, sender, message):
+        return True ## Message handled here            
     
-    if handling_user_comments(sender, message):
-        return {"status": "ok"} ## Message handled here
+    if handling_user_comments(bot_userid, channel_url, sender, message):
+        return True ## Message handled here
     
-    if handling_new_hires(sender, message):
-        return {"status": "ok"} ## Message handled here
+    # if handling_new_hires(bot_userid, channel_url, sender, message):
+    #     return {"status": "ok"} ## Message handled here
     
-    if handling_numbers(sender, message):
+    if handling_numbers(bot_userid, channel_url, sender, message):
         return True ## Message handled here
     
     if message in special_messages:
         if message in special_messages[-3:]: ## If the user is manually typing No, no, then handle here ##
             send_message_v2(bot_userid, channel_url, sender, wf_format.message_format(random.choice(config.default_fallback_answer)))
-            return True
+            return True ## Message handled here
         try:
             users_not_satisfied[sender] += 1
         except KeyError:
@@ -212,7 +212,7 @@ def respond(bot_userid, channel_url, sender, message):
     redirect_flag = False
 
     if redirect_flag:
-        pass
+        return {"status": "ok"}
     else:
         # response = azure_bot.azure_bot_response(message, sender)
         response = azure_bot.azure_bot_response_cqa(message, sender)
@@ -222,7 +222,8 @@ def respond(bot_userid, channel_url, sender, message):
             print("messages, prompts, images, did_i_answer_your_question_flag", messages, prompts, images, did_i_answer_your_question_flag, "\n")
         if messages:
             response = send_message_v2(bot_userid, channel_url, sender, messages)
-            if not images and not files and did_i_answer_your_question_flag:did_i_answer_your_question(bot_userid, channel_url, sender)
+            if not images and not files and did_i_answer_your_question_flag:
+                did_i_answer_your_question(bot_userid, channel_url, sender)
         if prompts:
             if(isinstance(prompts, tuple)):
                 response = send_message_v2(bot_userid, channel_url, sender, prompts[1])
@@ -413,6 +414,7 @@ def send_message_v2(bot_userid, channel_url, recipient_id, message_payload, save
     return response.json()
 
 def did_i_answer_your_question(bot_userid, channel_url, sender):
+    return True ## Remove this
     buttons = []
     buttons.append({"label":"yes","message":"DIAYQ-YES"})
     buttons.append({"label":"no","message":"DIAYQ-NO"})
