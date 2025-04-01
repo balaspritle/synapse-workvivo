@@ -128,13 +128,13 @@ def redirection(bot_userid, channel_url, sender, message):
         print("sender : {}, message ---> {} \n".format(sender, message))
     
     if handling_emails(sender, message):
-        return True ## Message handled here            
+        return {"status": "ok"} ## Message handled here            
     
     if handling_user_comments(sender, message):
-        return True ## Message handled here
+        return {"status": "ok"} ## Message handled here
     
     if handling_new_hires(sender, message):
-        return True ## Message handled here
+        return {"status": "ok"} ## Message handled here
     
     if handling_numbers(sender, message):
         return True ## Message handled here
@@ -230,10 +230,10 @@ def respond(bot_userid, channel_url, sender, message):
             else:
                 response = send_message_v2(bot_userid, channel_url, sender, prompts)
         if images and files:
-            response = send_message_v2(bot_userid, channel_url, sender, images)
             response = send_message_v2(bot_userid, channel_url, sender, files)
-            click_here_to_send_file_via_email(sender, email_trace + files['attachment']['payload']['attachment_id'])
-            if did_i_answer_your_question_flag:did_i_answer_your_question(bot_userid, channel_url, sender)
+            # click_here_to_send_file_via_email(bot_userid, channel_url, sender, email_trace + str(files))
+            response = send_message_v2(bot_userid, channel_url, sender, images)
+            # if did_i_answer_your_question_flag:did_i_answer_your_question(bot_userid, channel_url, sender)
             images, files = [], []
         if images:
             response = send_message_v2(bot_userid, channel_url, sender, images)
@@ -426,18 +426,11 @@ def new_hire_prompt(sender):
     buttons_holder.append({"title": "Would you like to know our annual leave benefit?", "buttons":buttons})
     send_message_v2(sender, {"attachment":{"type":"template","payload":{"template_type":"generic", "elements": buttons_holder}}})
 
-# def click_here_to_send_file_via_email(sender, attachment_id):
-#     buttons, buttons_holder = [], []
-#     buttons.append({"type":"postback","title":"Okay","payload":attachment_id})
-#     buttons.append({"type":"postback","title":"No Thanks","payload":"SAIDNOTOMAIL"})
-#     buttons_holder.append({"title": "Do you want me to send the file to your inbox?", "buttons":buttons})
-#     send_message_v2(sender, {"attachment":{"type":"template","payload":{"template_type":"generic", "elements": buttons_holder}}})
-
-def click_here_to_send_file_via_email(sender, attachment_id):
+def click_here_to_send_file_via_email(bot_userid, channel_url, sender, attachment_id):
     # Buttons #
-    buttons = []
-    buttons.append({"type":"postback","title":"Yes, email me","payload":attachment_id})
-    send_message_v2(sender, {"attachment":{"type":"template","payload":{"template_type":"button", "text": random.choice(config.default_email_sending_question), "buttons": buttons}}})
+    buttons = [{"label":"Yes, email me","message":attachment_id}]
+    payload = {"type": "card", "cards": [{"cardTitle": random.choice(config.default_email_sending_question), "cardDescription": "", "cardImage": "https://images.pexels.com/photos/574071/pexels-photo-574071.jpeg", "buttons": buttons}]}
+    send_message_v2(bot_userid, channel_url, sender, payload)
 
 def payload_preprocess(payload):
   try:

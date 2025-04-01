@@ -87,7 +87,7 @@ class scorer:
 class gamezone:
   def __init__(self):
     self.gameplay_secret_keyword = ["@trivia", "@TRIVIA", "@Trivia"]
-    self.gameplay_trigger_keyword = ["dereggirt yalp em@G"]
+    self.gameplay_trigger_keyword = ["St@rt the G@me"]
     self.encourage_prompts = ["Bingo!:)", "That's correct!", "Very good..", "You're on a roll", "Yup! Next please..", "Good", "You nailed it", "Woohooh", "Going strong…", "I'm impressed", \
                               "Yup yup!", "Cool!", "Spot on", "That's neat"]
     self.gamplay_correct_answer_prompt = "++^^**"
