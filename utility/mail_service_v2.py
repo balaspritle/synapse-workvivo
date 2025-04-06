@@ -11,7 +11,7 @@ from collections import Counter
 import concurrent.futures    
 import utility.db_utils as db_utils
 from utility.azure_log_analytics import query_log_analytics
-
+from utility.workvivo import fetch_user_email
 
 pd.options.mode.chained_assignment = None
 file_type = {'.pdf': 'application/pdf', '.xlsx': 'application/xlsx', '.xls': 'application/xls', '.docx': 'application/docx'}
@@ -131,7 +131,7 @@ def get_user_email(row, user_id_to_email_mapper):
     # try:
     #     for user_id_variant in user_id_variants:
     try:
-        return user_id_to_email_mapper[str(row['user_id'])]
+        return fetch_user_email(str(row['user_id']))
     except Exception as e:
         print("Error in get_user_email", str(e), row)
         return "N/A"
@@ -370,12 +370,8 @@ def consolidated_analytics(duration):
     # duration format --> tuple([datetime.datetime.strptime('2022-01-01', '%Y-%m-%d').date(), (datetime.datetime.strptime('2022-06-10', '%Y-%m-%d') + datetime.timedelta(days=1)).date()])
     print("consolidated_analytics duration -", duration)
     
-    all_fb_users = fb_workplace.all_users #get_all_user_id()
     user_id_to_email_mapper = {}
-    for user in all_fb_users:
-        if user.get('email'):
-            user_id_to_email_mapper[user['id']] = user['email']
-    
+
     ## Constants
     df1, df1_uncleaned, timespan = sendWeeklyChatLogs(duration=duration, user_id_to_email_mapper=user_id_to_email_mapper)
     df2 = db_filtering(duration, "user_comments")

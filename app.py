@@ -6,7 +6,7 @@ from flask import Flask, request, send_file, render_template, session, make_resp
 from flask_talisman import Talisman
 import json, secrets
 import utility.utils as utils
-# import utility.mail_service_v2 as mail_service
+import utility.mail_service_v2 as mail_service
 import utility.config as config_
 
 # app = FastAPI()
@@ -61,7 +61,18 @@ def webhook():
 
             return utils.respond(bot_userid, channel_url, user_email, text)
 
+# @app.route('/iris_analytics_trigger', methods=['GET'])
+# def consolidated_mail_send_trigger():
+#     if request.method == 'GET':
+#         headers = request.headers
+#         print("incoming headers at consolidated_mail_send_trigger", headers['Authorization'])
 
+#         try:
+#             mail_service.consolidated_analytics(7)
+#             return "OK"
+#         except Exception as e:
+#             print(e, "Error")
+#             return make_response("Bad Request", 400)
 
 # if __name__ == "__main__":
 #     app.run(host='0.0.0.0', port=8080)
