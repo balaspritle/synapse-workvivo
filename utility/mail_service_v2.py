@@ -3,7 +3,6 @@ import sendgrid, os, base64, time, shutil, datetime, pytz
 from dateutil import parser
 from sendgrid.helpers.mail import *
 import utility.aws as aws
-import utility.workvivo as fb_workplace
 import pandas as pd
 import numpy as np
 from dateutil import tz
@@ -173,7 +172,7 @@ def add_cache_data(df_cleaned, user_id_to_email_mapper, duration):
     
     df['Time'] = df.time.apply(extract_time)
 
-    user_id_to_remove = [100078065712033, "Default", "100078065712033"]
+    user_id_to_remove = [3003104378, "Default", "3003104378", "bala.v@zevigosolutions.com"]
     ignore_phrases = ["DIAYQ-YES", "ZEVIGOSOLUTIONSSEY", "ZEVIGOSOLUTIONSON", "Hi", "hi", "1.Power", "2.Nubaad", "3.Okay", "4.Cannot make it"]
 
     df = df[~df.user_id.isin(user_id_to_remove)]
@@ -261,7 +260,7 @@ def shoot_email(attachment_filepath):
             message = Mail(
                 from_email = 'do-not-reply@zevigosolutions.com',
                 to_emails = sender_email_,
-                subject = "Iris Bot - Complete Logs (Custom Question Answering)",
+                subject = "Iris Bot - Complete Logs (Custom Question Answering + Workvivo)",
                 html_content =  text
             )
             message.attachment = attachedFile
@@ -433,7 +432,8 @@ def consolidated_analytics(duration):
     except:
         final_df_file_name = "consolidated analytics_no_data_available.xlsx"
         
-    attachment_filepath = os.path.join( os.path.dirname(os.path.join(os.getcwd(), config.cache_path)), final_df_file_name)
+    # attachment_filepath = os.path.join( os.path.dirname(os.path.join(os.getcwd(), config.cache_path)), final_df_file_name)
+    attachment_filepath = os.path.join("/tmp", final_df_file_name)
     print("attachment_filepath", attachment_filepath)
     
     with pd.ExcelWriter(attachment_filepath) as writer:

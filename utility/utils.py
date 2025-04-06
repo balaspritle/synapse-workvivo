@@ -81,7 +81,7 @@ def handling_user_comments(bot_userid, channel_url, sender, message):
         users_comments_collector[sender] = message ## User comments collection happens here
         if config.debug:
             print("user comment >>>>>>>>", users_comments_collector[sender], user_feedback_rating)
-        # push_mail(sender, "USER COMMENT AND RATING", " User Comment :" + users_comments_collector[sender] + ", Feedback Rating :" +str(user_feedback_rating))
+        push_mail(sender, "USER COMMENT AND RATING", " User Comment :" + users_comments_collector[sender] + ", Feedback Rating :" +str(user_feedback_rating))
         collect_comments_and_rating(sender, users_comments_collector[sender], user_feedback_rating)
         send_message_v2(bot_userid, channel_url, sender, wf_format.message_format(random.choice(config.default_comments_response_message)))
         

@@ -4,7 +4,7 @@ load_dotenv(dotenv_path='.env')
 # from fastapi import FastAPI, Request
 from flask import Flask, request, send_file, render_template, session, make_response
 from flask_talisman import Talisman
-import json, secrets
+import json, secrets, os, concurrent.futures
 import utility.utils as utils
 import utility.mail_service_v2 as mail_service
 import utility.config as config_
@@ -61,18 +61,46 @@ def webhook():
 
             return utils.respond(bot_userid, channel_url, user_email, text)
 
-# @app.route('/iris_analytics_trigger', methods=['GET'])
-# def consolidated_mail_send_trigger():
-#     if request.method == 'GET':
-#         headers = request.headers
-#         print("incoming headers at consolidated_mail_send_trigger", headers['Authorization'])
 
-#         try:
-#             mail_service.consolidated_analytics(7)
-#             return "OK"
-#         except Exception as e:
-#             print(e, "Error")
-#             return make_response("Bad Request", 400)
+@app.route('/iris_analytics_trigger', methods=['GET'])
+def consolidated_mail_send_trigger():
+    if request.method == 'GET':
+        headers = request.headers
+        print("incoming headers at consolidated_mail_send_trigger", headers['Authorization'])
+        if headers['Authorization'] == "Bearer " + os.getenv("WORKVIVO_TOKEN"):
+            try:
+                mail_service.consolidated_analytics(7)
+                return {"status": "ok"}
+            except Exception as e:
+                print(e, "Error")
+                return make_response("Bad Request", 400)
+        else:
+            return {"status": "Auth Token Mismatch"}
+
+
+@app.route('/iris_analytics', methods=['GET','POST'])
+def consolidated_mail_send():
+    import utility.datastructures as datastructures
+    form = datastructures.InfoForm()
+    if form.validate_on_submit():
+        duration = None
+        session['startdate'] = form.startdate.data
+        session['enddate'] = form.enddate.data
+        session['days'] = form.days.data
+        
+        if(session['days'] is not None):
+            duration = int(session['days'])
+        else:
+            duration = tuple([session['startdate'], session['enddate']])
+        
+        try:
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                futures = executor.map(mail_service.consolidated_analytics, [duration,])
+            return render_template('date.html')
+        except Exception as e:
+            print("Error occured consolidated_mail_send", str(e))
+    return render_template('index.html', form=form)
+
 
 # if __name__ == "__main__":
 #     app.run(host='0.0.0.0', port=8080)

@@ -1,4 +1,4 @@
-import os
+import os, ast
 
 ## Set it to False for Titan and True for Pierce
 use_cache = True
@@ -9,7 +9,7 @@ debug = False
 azure_bot_url = os.getenv("AZURE_BOT_URL")
 
 # Sender email for escalations
-sender_email = ["ihis.hcm.enquiries@ihis.com.sg","nans.sgp@gmail.com","praveen.r@spritle.com","balakrishnav@spritle.com"]
+sender_email = ast.literal_eval(os.getenv("SENDER_EMAIL")) # ["ihis.hcm.enquiries@ihis.com.sg","nans.sgp@gmail.com","praveen.r@spritle.com","balakrishnav@spritle.com"]
     
 ## Constants
 azure_bot_authorization_token = os.getenv("AZURE_BOT_AUTH_TOKEN")
