@@ -29,8 +29,8 @@ def split_s3_bucket_key(s3_path):
 def download_from_s3(s3_uri):
     bucket, filename = split_s3_bucket_key(s3_uri)
     unique_folder = str(uuid.uuid4())[0:8]
-    os.makedirs(os.path.join(os.getcwd(), "tmp", unique_folder), exist_ok=True)
+    os.makedirs(os.path.join(os.getcwd(), "/tmp", unique_folder), exist_ok=True)
     
-    filepath = os.path.join(os.getcwd(), "tmp", unique_folder, filename)
+    filepath = os.path.join(os.getcwd(), "/tmp", unique_folder, filename)
     s3_resource.Bucket(bucket).download_file(filename, filepath)
     return filepath

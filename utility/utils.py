@@ -1,4 +1,5 @@
-import utility.config as config, utility.azure_bot as azure_bot, utility.db_utils as db_utils #, utility.mail_service as mail_service,
+import utility.config as config, utility.azure_bot as azure_bot, utility.db_utils as db_utils, utility.workvivo as workvivo_utils, utility.mail_service_v2 as mail_service
+from utility.attachments import attachment_mapper_swapped
 from utility.datastructures import WORKVIVO_FORMATTER, DATA_COLLECTOR
 import requests, random, datetime, pytz, time, os, json, ast
 import numpy as np
@@ -33,8 +34,7 @@ headersList = {"Accept": "*/*",  "Accept": "application/json", "Workvivo-Id": WO
 def handling_emails(bot_userid, channel_url, sender, message):
     if(email_trace in message):
         send_message_v2(bot_userid, channel_url, sender, wf_format.message_format(random.choice(config.default_mail_sent_message)))
-        local_prompts = {'attachment': {'type': 'template', 'payload': {'template_type': 'button', 'text': 'Great! Is there anything else I can help you with today ?', 'buttons': [{'type': 'postback', 'title': 'Yes', 'payload': 'ZEVIGOSOLUTIONSSEY'}, {'type': 'postback', 'title': 'No', 'payload': 'ZEVIGOSOLUTIONSON'}]}}}
-        send_message_v2(bot_userid, channel_url, sender, local_prompts)
+        send_message_v2(bot_userid, channel_url, sender, wf_format.prompt_messages_format("Great! Is there anything else I can help you with today ?", ['ZEVIGOSOLUTIONSSEY', 'ZEVIGOSOLUTIONSON']))
         
         ## Send An Email Here based on the attachment_id ##
         mail_data = [{'sender_id': sender, 'attachment_id': message.split(email_trace)[-1]}] ## ASync Email Push
@@ -123,7 +123,8 @@ def game_redirection(bot_userid, channel_url, sender, message):
         print("Error in >>>>>>>> game_redirection", e)
 
 def redirection(bot_userid, channel_url, sender, message):
-    
+    return False ## Remove this
+
     if config.debug:
         print("sender : {}, message ---> {} \n".format(sender, message))
     
@@ -188,7 +189,6 @@ def redirection(bot_userid, channel_url, sender, message):
     
     return False
     
-# def respond(sender, message):
 def respond(bot_userid, channel_url, sender, message):   
     """Formulate a response to the user and
     pass it on to a function that sends it."""
@@ -208,8 +208,7 @@ def respond(bot_userid, channel_url, sender, message):
     user_chat_timestamp = str(datetime.datetime.strftime(datetime.datetime.now(pytz.timezone('Asia/Singapore')), "%Y-%m-%d %H:%M:%S"))
     users_chat_data_holder[sender].store_logs(sender, user_chat_timestamp + " - User : " + message) ## Log user's message ##
     
-    # redirect_flag = redirection(bot_userid, channel_url, sender, message) ## Redirection happens here ##
-    redirect_flag = False
+    redirect_flag = redirection(bot_userid, channel_url, sender, message) ## Redirection happens here ##
 
     if redirect_flag:
         return {"status": "ok"}
@@ -232,16 +231,16 @@ def respond(bot_userid, channel_url, sender, message):
                 response = send_message_v2(bot_userid, channel_url, sender, prompts)
         if images and files:
             response = send_message_v2(bot_userid, channel_url, sender, files)
-            # click_here_to_send_file_via_email(bot_userid, channel_url, sender, email_trace + str(files))
+            click_here_to_send_file_via_email(bot_userid, channel_url, sender, email_trace + attachment_mapper_swapped(files['cards'][0]['buttons'][0]['link']))
             response = send_message_v2(bot_userid, channel_url, sender, images)
-            # if did_i_answer_your_question_flag:did_i_answer_your_question(bot_userid, channel_url, sender)
+            if did_i_answer_your_question_flag:did_i_answer_your_question(bot_userid, channel_url, sender)
             images, files = [], []
         if images:
             response = send_message_v2(bot_userid, channel_url, sender, images)
-            # if did_i_answer_your_question_flag:did_i_answer_your_question(bot_userid, channel_url, sender)
+            if did_i_answer_your_question_flag:did_i_answer_your_question(bot_userid, channel_url, sender)
         if files:
             response = send_message_v2(bot_userid, channel_url, sender, files)
-            # click_here_to_send_file_via_email(sender, email_trace + files['attachment']['payload']['attachment_id'])
+            click_here_to_send_file_via_email(bot_userid, channel_url, sender, email_trace + attachment_mapper_swapped(files['cards'][0]['buttons'][0]['link']))
             if did_i_answer_your_question_flag:did_i_answer_your_question(bot_userid, channel_url, sender)
         return response
 
@@ -414,7 +413,7 @@ def send_message_v2(bot_userid, channel_url, recipient_id, message_payload, save
     return response.json()
 
 def did_i_answer_your_question(bot_userid, channel_url, sender):
-    return True ## Remove this
+    return False ## Remove this
     buttons = []
     buttons.append({"label":"yes","message":"DIAYQ-YES"})
     buttons.append({"label":"no","message":"DIAYQ-NO"})
@@ -429,7 +428,7 @@ def new_hire_prompt(sender):
     send_message_v2(sender, {"attachment":{"type":"template","payload":{"template_type":"generic", "elements": buttons_holder}}})
 
 def click_here_to_send_file_via_email(bot_userid, channel_url, sender, attachment_id):
-    # Buttons #
+    return False ## Remove this
     buttons = [{"label":"Yes, email me","message":attachment_id}]
     payload = {"type": "card", "cards": [{"cardTitle": random.choice(config.default_email_sending_question), "cardDescription": "", "cardImage": "https://images.pexels.com/photos/574071/pexels-photo-574071.jpeg", "buttons": buttons}]}
     send_message_v2(bot_userid, channel_url, sender, payload)
@@ -475,10 +474,10 @@ def email_data_formatting(message_content, user_details):
         text += item + " \n "
     return text
 
-def get_fb_user_data(sender_id):
+def get_workvivo_user_data(sender_id):
     ## Get User's Details with error handling ##
     try:
-        user_data = fb_workplace.get_user_data(sender_id)
+        user_data = workvivo_utils.get_user_data(sender_id)
         return user_data
     except KeyError:
         return {'name': 'Praveen R', 'id': sender_id, 'email': 'praveen.r@spritle.com'}
@@ -486,14 +485,13 @@ def get_fb_user_data(sender_id):
 def push_mail(data):
     try:
         # user_data = fb_workplace.get_user_data(data['sender_id'])
-        user_data = get_fb_user_data(data['sender_id'])
+        user_data = get_workvivo_user_data(data['sender_id'])
         mail_service.sendEmail("ChatBot Query", str(email_data_formatting(data, user_data)))
         
         timestamp = str(datetime.datetime.strftime(datetime.datetime.now(pytz.timezone('Asia/Singapore')), "%Y-%m-%d"))
         query = "INSERT INTO user_escalations (date, user_id) VALUES (%s, %s)"
         argument = (timestamp, data['sender_id'])
         db_utils.insert_data_to_db(query, argument)
-        
     except Exception as e:
         print(e)
         print("Error in sending email")
@@ -501,7 +499,7 @@ def push_mail(data):
 
 def push_mail_with_attachment(data):
     try:
-        user_data = get_fb_user_data(data['sender_id'])
+        user_data = get_workvivo_user_data(data['sender_id'])
         mail_service.sendEmailWithAttachment(user_data, data['attachment_id'])
     except Exception as e:
         print(e)

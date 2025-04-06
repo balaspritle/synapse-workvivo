@@ -5,7 +5,7 @@ from wtforms.fields import DateField, IntegerField
 from wtforms.validators import Optional
 from wtforms import validators, SubmitField
 import utility.db_utils as db_utils
-
+from utility.attachments import attachment_mapper
 
 class InfoForm(FlaskForm):
     startdate = DateField('Start Date', format='%Y-%m-%d', validators=[Optional(),])
@@ -66,18 +66,33 @@ class WORKVIVO_FORMATTER:
           "type": "card",
           "cards": [
             {
-              "cardTitle": "Did I answer your question?",
-              "cardDescription": str(image_id),
-              "cardImage": "https://images.pexels.com/photos/574071/pexels-photo-574071.jpeg",
-              "buttons": [{'label': 'yes', 'message': 'DIAYQ-YES'}, {'label': 'no', 'message': 'DIAYQ-NO'}]
+              "cardTitle": "Please click the button to view the image",
+              "cardDescription": "",
+              "cardImage": "",
+              "buttons": [
+                {'label': 'Image File', 'link': attachment_mapper(image_id, "image")}
+              ]
             }
-          ]}
+          ]
+        }
     return False
   
   def file_format(self, files):
     if files:
       for file_id in files:
-        return {"type": "message", "message": "Please download the file using this link - " + file_id}
+        return {
+          "type": "card",
+          "cards": [
+            {
+              "cardTitle": "Please click the button to view the file",
+              "cardDescription": "",
+              "cardImage": "",
+              "buttons": [
+                {'label' : 'File', 'link' : attachment_mapper(file_id, "file")}
+              ]
+            }
+          ]
+        }
     return False
   
 

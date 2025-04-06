@@ -3,13 +3,12 @@ import sendgrid, os, base64, time, shutil, datetime, pytz
 from dateutil import parser
 from sendgrid.helpers.mail import *
 import utility.aws as aws
-import utility.fb_workplace as fb_workplace
+import utility.workvivo as fb_workplace
 import pandas as pd
 import numpy as np
 from dateutil import tz
 from collections import Counter
 import concurrent.futures    
-from apscheduler.schedulers.background import BackgroundScheduler
 import utility.db_utils as db_utils
 from utility.azure_log_analytics import query_log_analytics
 
@@ -462,13 +461,13 @@ def all_weekly_mails(duration = 7):
     with concurrent.futures.ThreadPoolExecutor() as executor:
         futures = executor.map(consolidated_analytics, [duration,])
         
-scheduler = BackgroundScheduler(timezone=config.timezone)
-scheduler.start()
+# scheduler = BackgroundScheduler(timezone=config.timezone)
+# scheduler.start()
 
-scheduler.add_job(
-    all_weekly_mails,
-    'cron',
-    day_of_week=config.day_of_the_week, 
-    hour=config.hour, 
-    minute=config.minute
-)
+# scheduler.add_job(
+#     all_weekly_mails,
+#     'cron',
+#     day_of_week=config.day_of_the_week, 
+#     hour=config.hour, 
+#     minute=config.minute
+# )
