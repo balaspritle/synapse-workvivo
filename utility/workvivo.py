@@ -42,4 +42,4 @@ def fetch_user_email(id_):
     user_email_cache[id_] = email
     return email
 
-# print(">>>>", get_user_email('3003104378'))
+# print(">>>>", get_user_data('3003104378'))

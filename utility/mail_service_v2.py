@@ -29,10 +29,8 @@ def sendEmail(subject, content):
             mail = Mail(from_email, to_email, subject, content)
             response = sg.client.mail.send.post(request_body=mail.get())
             print("sendEmail", response.status_code) #, response.body, response.headers)
-            return True
         except Exception as e:
             print(e)
-            return False
 
 def send_Failsafe_Email(subject, content):
     for sender_email_ in ["nans.sgp@gmail.com","praveen.r@spritle.com","balakrishnav@spritle.com"]:
@@ -43,10 +41,8 @@ def send_Failsafe_Email(subject, content):
             mail = Mail(from_email, to_email, subject, content)
             response = sg.client.mail.send.post(request_body=mail.get())
             print("sendEmail", response.status_code) #, response.body, response.headers)
-            return True
         except Exception as e:
             print(e)
-            return False
     
 def sendEmailWithAttachment(user_data, attachment_id):
     # print(user_data, attachment_id, "user_data & attachment_id")

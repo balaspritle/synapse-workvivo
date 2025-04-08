@@ -81,7 +81,7 @@ def handling_user_comments(bot_userid, channel_url, sender, message):
         users_comments_collector[sender] = message ## User comments collection happens here
         if config.debug:
             print("user comment >>>>>>>>", users_comments_collector[sender], user_feedback_rating)
-        push_mail(sender, "USER COMMENT AND RATING", " User Comment :" + users_comments_collector[sender] + ", Feedback Rating :" +str(user_feedback_rating))
+        # push_mail(sender, "USER COMMENT AND RATING", " User Comment :" + users_comments_collector[sender] + ", Feedback Rating :" +str(user_feedback_rating))
         collect_comments_and_rating(sender, users_comments_collector[sender], user_feedback_rating)
         send_message_v2(bot_userid, channel_url, sender, wf_format.message_format(random.choice(config.default_comments_response_message)))
         
@@ -123,7 +123,7 @@ def game_redirection(bot_userid, channel_url, sender, message):
         print("Error in >>>>>>>> game_redirection", e)
 
 def redirection(bot_userid, channel_url, sender, message):
-    return False ## Remove this
+    # return False ## Remove this
 
     if config.debug:
         print("sender : {}, message ---> {} \n".format(sender, message))
@@ -413,11 +413,11 @@ def send_message_v2(bot_userid, channel_url, recipient_id, message_payload, save
     return response.json()
 
 def did_i_answer_your_question(bot_userid, channel_url, sender):
-    return False ## Remove this
+    # return False ## Remove this
     buttons = []
     buttons.append({"label":"yes","message":"DIAYQ-YES"})
     buttons.append({"label":"no","message":"DIAYQ-NO"})
-    payload = {"type": "card", "cards": [{"cardTitle": random.choice(config.default_did_I_answer_your_question), "cardDescription": "", "cardImage": "https://images.pexels.com/photos/574071/pexels-photo-574071.jpeg", "buttons": buttons}]}
+    payload = {"type": "card", "cards": [{"cardTitle": random.choice(config.default_did_I_answer_your_question), "cardDescription": "", "cardImage": "https://synapxe.workvivo.com/document/link/77793", "buttons": buttons}]}
     send_message_v2(bot_userid, channel_url, sender, payload)
 
 def new_hire_prompt(sender):
@@ -428,9 +428,9 @@ def new_hire_prompt(sender):
     send_message_v2(sender, {"attachment":{"type":"template","payload":{"template_type":"generic", "elements": buttons_holder}}})
 
 def click_here_to_send_file_via_email(bot_userid, channel_url, sender, attachment_id):
-    return False ## Remove this
+    # return False ## Remove this
     buttons = [{"label":"Yes, email me","message":attachment_id}]
-    payload = {"type": "card", "cards": [{"cardTitle": random.choice(config.default_email_sending_question), "cardDescription": "", "cardImage": "https://images.pexels.com/photos/574071/pexels-photo-574071.jpeg", "buttons": buttons}]}
+    payload = {"type": "card", "cards": [{"cardTitle": random.choice(config.default_email_sending_question), "cardDescription": "", "cardImage": "https://synapxe.workvivo.com/document/link/77792", "buttons": buttons}]}
     send_message_v2(bot_userid, channel_url, sender, payload)
 
 def payload_preprocess(payload):
@@ -451,10 +451,13 @@ def payload_preprocess(payload):
  
 
 def email_data_formatting(message_content, user_details):
+    print("email_data_formatting inputs", message_content, user_details)
+
     text = ""
     text += "** USER DETAILS **\n"
-    for k,v in user_details.items():
-        text += k + " : " + v + "\n"
+    text += str(user_details)
+    # for k,v in user_details.items():
+    #     text += k + " : " + v + "\n"
     text += "\n\n"
     
     text += "** CHAT LOGS **\n"
