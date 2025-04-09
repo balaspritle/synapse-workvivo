@@ -30,7 +30,7 @@ default_fallback_question = ["No, I am looking for something else"]
 default_new_hire_welcome_message = ["Hi there! Hope your first week/month has been well. I'm Iris and I can help with information on our HCM policies."]
 maintenance_message = "Currently I am under maintenance. Please try again after some time. Thanks!!!"
 maximum_suggestions = 6
-suggestions_threshold = 0.4
+suggestions_threshold = 0.5
 score_threshold = 80
 
 ## Sendgrid for emails

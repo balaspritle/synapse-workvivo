@@ -38,9 +38,9 @@ class WORKVIVO_FORMATTER:
       if complete_message == "":
         complete_message += random.choice(config.default_prompt_message)
         
-      if len(prompts) < 1 or prompts == ['Yes', 'No'] or prompts == ['ZEVIGOSOLUTIONSSEY', 'ZEVIGOSOLUTIONSON']:
-        if prompts == ['ZEVIGOSOLUTIONSSEY', 'ZEVIGOSOLUTIONSON']:
-          mapper = {'ZEVIGOSOLUTIONSSEY':'Yes', 'ZEVIGOSOLUTIONSON':'No'}
+      if len(prompts) < 1 or prompts == ['Yes', 'No'] or prompts == ['SYNAPSEYES', 'SYNAPSENO']:
+        if prompts == ['SYNAPSEYES', 'SYNAPSENO']:
+          mapper = {'SYNAPSEYES':'Yes', 'SYNAPSENO':'No'}
           buttons = [{"label":mapper[str(prompt)],"message":str(prompt)} for prompt in prompts]
           return {"type": "card", "cards": [{"cardTitle": complete_message, "cardDescription": "", "cardImage": "https://synapxe.workvivo.com/document/link/77793", "buttons": buttons}]}
         # else:

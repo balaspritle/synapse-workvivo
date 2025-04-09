@@ -25,7 +25,7 @@ users_not_satisfied = {}
 no_bot_match = {}
 users_comments_collector = {}
 returning_user_data_holder = []
-email_trace = '$$$ZEVIGOEMAILHANDLER$$$'
+email_trace = '$$$SYNAPSEEMAILHANDLER$$$'
 new_hire_trace = {"ZEVIGOSOLUTIONSNHIRENO" : "No worries. How about medical claim process?", "ZEVIGOSOLUTIONSNHIRENO2" : "Sure. Give me a question or topic to start"}
 special_messages = config.default_fallback_question + ['DIAYQ-NO', 'No', 'no', 'NO'] # Also include the default fallback question for email flow consideration.
 holder = namedtuple('holder', 'messages prompts images files did_i_answer_your_question_flag')
@@ -34,7 +34,7 @@ headersList = {"Accept": "*/*",  "Accept": "application/json", "Workvivo-Id": WO
 def handling_emails(bot_userid, channel_url, sender, message):
     if(email_trace in message):
         send_message_v2(bot_userid, channel_url, sender, wf_format.message_format(random.choice(config.default_mail_sent_message)))
-        send_message_v2(bot_userid, channel_url, sender, wf_format.prompt_messages_format("Great! Is there anything else I can help you with today ?", ['ZEVIGOSOLUTIONSSEY', 'ZEVIGOSOLUTIONSON']))
+        send_message_v2(bot_userid, channel_url, sender, wf_format.prompt_messages_format("Great! Is there anything else I can help you with today ?", ['SYNAPSEYES', 'SYNAPSENO']))
         
         ## Send An Email Here based on the attachment_id ##
         mail_data = [{'sender_id': sender, 'attachment_id': message.split(email_trace)[-1]}] ## ASync Email Push
@@ -123,7 +123,7 @@ def game_redirection(bot_userid, channel_url, sender, message):
         print("Error in >>>>>>>> game_redirection", e)
 
 def redirection(bot_userid, channel_url, sender, message):
-    # return False ## Remove this
+    return False ## Remove this
 
     if config.debug:
         print("sender : {}, message ---> {} \n".format(sender, message))
@@ -413,7 +413,7 @@ def send_message_v2(bot_userid, channel_url, recipient_id, message_payload, save
     return response.json()
 
 def did_i_answer_your_question(bot_userid, channel_url, sender):
-    # return False ## Remove this
+    return False ## Remove this
     buttons = []
     buttons.append({"label":"yes","message":"DIAYQ-YES"})
     buttons.append({"label":"no","message":"DIAYQ-NO"})
@@ -428,7 +428,7 @@ def new_hire_prompt(sender):
     send_message_v2(sender, {"attachment":{"type":"template","payload":{"template_type":"generic", "elements": buttons_holder}}})
 
 def click_here_to_send_file_via_email(bot_userid, channel_url, sender, attachment_id):
-    # return False ## Remove this
+    return False ## Remove this
     buttons = [{"label":"Yes, email me","message":attachment_id}]
     payload = {"type": "card", "cards": [{"cardTitle": random.choice(config.default_email_sending_question), "cardDescription": "", "cardImage": "https://synapxe.workvivo.com/document/link/77792", "buttons": buttons}]}
     send_message_v2(bot_userid, channel_url, sender, payload)

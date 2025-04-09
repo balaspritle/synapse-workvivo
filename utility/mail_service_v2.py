@@ -145,7 +145,7 @@ def utc_to_sgt(row):
     
 def chatlog_formatter(df, user_id_to_email_mapper):
     user_id_to_remove = [100078065712033, "Default", "100078065712033"]
-    ignore_phrases = ["DIAYQ-YES", "ZEVIGOSOLUTIONSSEY", "ZEVIGOSOLUTIONSON", "Hi", "hi", "1.Power", "2.Nubaad", "3.Okay", "4.Cannot make it"]
+    ignore_phrases = ["DIAYQ-YES", "SYNAPSEYES", "SYNAPSENO", "Hi", "hi", "1.Power", "2.Nubaad", "3.Okay", "4.Cannot make it"]
     
     df = df.drop(labels=['KbId'], axis=1)
 
@@ -169,7 +169,7 @@ def add_cache_data(df_cleaned, user_id_to_email_mapper, duration):
     df['Time'] = df.time.apply(extract_time)
 
     user_id_to_remove = [3003104378, "Default", "3003104378", "bala.v@zevigosolutions.com"]
-    ignore_phrases = ["DIAYQ-YES", "ZEVIGOSOLUTIONSSEY", "ZEVIGOSOLUTIONSON", "Hi", "hi", "1.Power", "2.Nubaad", "3.Okay", "4.Cannot make it"]
+    ignore_phrases = ["DIAYQ-YES", "SYNAPSEYES", "SYNAPSENO", "Hi", "hi", "1.Power", "2.Nubaad", "3.Okay", "4.Cannot make it"]
 
     df = df[~df.user_id.isin(user_id_to_remove)]
     df = df[~df.question.isin(ignore_phrases)]
