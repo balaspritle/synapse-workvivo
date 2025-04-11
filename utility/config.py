@@ -30,7 +30,7 @@ default_fallback_question = ["No, I am looking for something else"]
 default_new_hire_welcome_message = ["Hi there! Hope your first week/month has been well. I'm Iris and I can help with information on our HCM policies."]
 maintenance_message = "Currently I am under maintenance. Please try again after some time. Thanks!!!"
 maximum_suggestions = 6
-suggestions_threshold = 0.5
+suggestions_threshold = float(os.getenv("SUGGESTIONS_THRESHOLD"))
 score_threshold = 80
 
 ## Sendgrid for emails
@@ -70,6 +70,7 @@ hour = 8
 minute = 30
 
 ## Cache Mechanism
-cache_path = 'logs/cache.json'
+# cache_path = 'logs/cache.json'
+cache_path = '/tmp/cache.json'
 save_cache_for_every = 10
 save_user_cache_for_every = 10

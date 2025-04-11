@@ -215,7 +215,7 @@ def respond(bot_userid, channel_url, sender, message):
     else:
         # response = azure_bot.azure_bot_response(message, sender)
         response = azure_bot.azure_bot_response_cqa(message, sender)
-        formatted_response = postprocess_azure_response_v2(sender, response, returning_user_data_holder)
+        formatted_response = postprocess_azure_response_v2(bot_userid, channel_url, sender, response, returning_user_data_holder)
         messages, prompts, images, files, did_i_answer_your_question_flag = formatted_response.messages, formatted_response.prompts, formatted_response.images,  formatted_response.files,  formatted_response.did_i_answer_your_question_flag
         if config.debug:
             print("messages, prompts, images, did_i_answer_your_question_flag", messages, prompts, images, did_i_answer_your_question_flag, "\n")
@@ -244,11 +244,11 @@ def respond(bot_userid, channel_url, sender, message):
             if did_i_answer_your_question_flag:did_i_answer_your_question(bot_userid, channel_url, sender)
         return response
 
-def sending_email(sender):
+def sending_email(bot_userid, channel_url, sender):
     hr_email_flag_2 = find_three_consecutive_not_found(users_chat_data_holder[sender].__dict__['chat_log'])
     if hr_email_flag_2:
-        send_message_v2(sender, wf_format.message_format(random.choice(config.default_no_flow_message)))
-        send_message_v2(sender, wf_format.message_format(random.choice(config.default_mail_flow_final_message)))
+        send_message_v2(bot_userid, channel_url, sender, wf_format.message_format(random.choice(config.default_no_flow_message)))
+        send_message_v2(bot_userid, channel_url, sender, wf_format.message_format(random.choice(config.default_mail_flow_final_message)))
         
         user_data = [users_chat_data_holder[sender].__dict__] ## ASync Email Push
         
@@ -265,7 +265,7 @@ def sending_email(sender):
     else:
         return False
     
-def postprocess_azure_response_v2(sender_id, bot_response, returning_user_data_holder):
+def postprocess_azure_response_v2(bot_userid, channel_url, sender_id, bot_response, returning_user_data_holder):
   messages, prompt_messages, prompts, images, files, add_fallback = [], [], [], [], [], []
   did_i_answer_your_question_flag = False
 #   global returning_user_data_holder
@@ -292,7 +292,7 @@ def postprocess_azure_response_v2(sender_id, bot_response, returning_user_data_h
           count = no_bot_match[sender_id]
           
           if count >= config.threshold:
-              if(sending_email(sender_id)):
+              if(sending_email(bot_userid, channel_url, sender_id)):
                   outputs = holder._make([ wf_format.message_format(messages), wf_format.prompt_messages_format(prompt_messages, prompts), wf_format.image_format(images), wf_format.file_format(files), did_i_answer_your_question_flag ])
                   return outputs
               else:
