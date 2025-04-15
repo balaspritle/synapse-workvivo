@@ -144,8 +144,8 @@ def utc_to_sgt(row):
     return str(sgt).split('.')[0], str(sgt.date()), str(sgt.time()).split('.')[0]
     
 def chatlog_formatter(df, user_id_to_email_mapper):
-    user_id_to_remove = [100078065712033, "Default", "100078065712033"]
-    ignore_phrases = ["DIAYQ-YES", "SYNAPSEYES", "SYNAPSENO", "Hi", "hi", "1.Power", "2.Nubaad", "3.Okay", "4.Cannot make it"]
+    user_id_to_remove = [100078065712033, "Default", "100078065712033", "bala.v@zevigosolutions.com"]
+    ignore_phrases = ["<< Yes >>", "< Yes >", "<< No >>", "< No >", "Hi", "hi", "1.Power", "2.Nubaad", "3.Okay", "4.Cannot make it"]
     
     df = df.drop(labels=['KbId'], axis=1)
 
@@ -169,7 +169,7 @@ def add_cache_data(df_cleaned, user_id_to_email_mapper, duration):
     df['Time'] = df.time.apply(extract_time)
 
     user_id_to_remove = [3003104378, "Default", "3003104378", "bala.v@zevigosolutions.com"]
-    ignore_phrases = ["DIAYQ-YES", "SYNAPSEYES", "SYNAPSENO", "Hi", "hi", "1.Power", "2.Nubaad", "3.Okay", "4.Cannot make it"]
+    ignore_phrases = ["<< Yes >>", "< Yes >", "< No >", "Hi", "hi", "1.Power", "2.Nubaad", "3.Okay", "4.Cannot make it"]
 
     df = df[~df.user_id.isin(user_id_to_remove)]
     df = df[~df.question.isin(ignore_phrases)]
@@ -386,7 +386,7 @@ def consolidated_analytics(duration):
     ## Graph - 4 - Scores Distribution
     df1_graph_4 = func_graph_4(df1)    
 
-    # df1_uncleaned = df1_uncleaned[df1_uncleaned['question'] == "DIAYQ-YES"]
+    # df1_uncleaned = df1_uncleaned[df1_uncleaned['question'] == "<< Yes >>"]
     # holder = {}
     # for date_ in pd.unique(df1_uncleaned.Date):
     #     holder[date_] = len(pd.unique(df1_uncleaned[df1_uncleaned.Date == date_]['UserId']))
@@ -395,7 +395,7 @@ def consolidated_analytics(duration):
 
     ## Graph - 5 - df4 postprocessing
     # df4['User Email'] = df4.apply(get_user_email, user_id_to_email_mapper = user_id_to_email_mapper, axis = 1)
-    # df4['Message Content'] = df4['Message Content'].apply(lambda x: "No" if x == "DIAYQ-NO" else x)
+    # df4['Message Content'] = df4['Message Content'].apply(lambda x: "No" if x == "< No >" else x)
     # df4 = df4[['Date', 'User Id', 'User Email', 'Message Content']]
     
     ## Graph - 5 - df3 postprocessing 
@@ -420,7 +420,7 @@ def consolidated_analytics(duration):
     ## Returning users
     # holder = []
     # for user_id_ in pd.unique(df1.UserId):
-    #     holder.append(tuple([user_id_, df1[df1['UserId'] == user_id_]['User Email'].values[0], df1[df1['UserId'] == user_id_].shape[0], df1_uncleaned[(df1_uncleaned['UserId'] == user_id_) & (df1_uncleaned['question'] == "DIAYQ-YES") ].shape[0] ]))
+    #     holder.append(tuple([user_id_, df1[df1['UserId'] == user_id_]['User Email'].values[0], df1[df1['UserId'] == user_id_].shape[0], df1_uncleaned[(df1_uncleaned['UserId'] == user_id_) & (df1_uncleaned['question'] == "<< Yes >>") ].shape[0] ]))
     # df9 = pd.DataFrame(holder, columns=['User ID', 'User Email', 'how many times transacted within the month',	'how many queries resolved'])  
     
     try:

@@ -174,3 +174,4 @@ cython_debug/
 .pypirc
 README.md
 logs/*.xlsx
+utility/mail_service.py

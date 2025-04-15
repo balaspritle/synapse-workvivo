@@ -27,14 +27,14 @@ users_comments_collector = {}
 returning_user_data_holder = []
 email_trace = '$$$SYNAPSEEMAILHANDLER$$$'
 new_hire_trace = {"ZEVIGOSOLUTIONSNHIRENO" : "No worries. How about medical claim process?", "ZEVIGOSOLUTIONSNHIRENO2" : "Sure. Give me a question or topic to start"}
-special_messages = config.default_fallback_question + ['DIAYQ-NO', 'No', 'no', 'NO'] # Also include the default fallback question for email flow consideration.
+special_messages = config.default_fallback_question + ['< No >', 'No', 'no', 'NO'] # Also include the default fallback question for email flow consideration.
 holder = namedtuple('holder', 'messages prompts images files did_i_answer_your_question_flag')
 headersList = {"Accept": "*/*",  "Accept": "application/json", "Workvivo-Id": WORKVIVO_ID, "Authorization": f"Bearer {WORKVIVO_TOKEN}","Content-Type": "application/json"}
 
 def handling_emails(bot_userid, channel_url, sender, message):
     if(email_trace in message):
         send_message_v2(bot_userid, channel_url, sender, wf_format.message_format(random.choice(config.default_mail_sent_message)))
-        send_message_v2(bot_userid, channel_url, sender, wf_format.prompt_messages_format("Great! Is there anything else I can help you with today ?", ['SYNAPSEYES', 'SYNAPSENO']))
+        send_message_v2(bot_userid, channel_url, sender, wf_format.prompt_messages_format("Great! Is there anything else I can help you with today ?", ['< Yes >', '< No >']))
         
         ## Send An Email Here based on the attachment_id ##
         mail_data = [{'sender_id': sender, 'attachment_id': message.split(email_trace)[-1]}] ## ASync Email Push
@@ -123,8 +123,6 @@ def game_redirection(bot_userid, channel_url, sender, message):
         print("Error in >>>>>>>> game_redirection", e)
 
 def redirection(bot_userid, channel_url, sender, message):
-    return False ## Remove this
-
     if config.debug:
         print("sender : {}, message ---> {} \n".format(sender, message))
     
@@ -413,10 +411,9 @@ def send_message_v2(bot_userid, channel_url, recipient_id, message_payload, save
     return response.json()
 
 def did_i_answer_your_question(bot_userid, channel_url, sender):
-    return False ## Remove this
     buttons = []
-    buttons.append({"label":"yes","message":"DIAYQ-YES"})
-    buttons.append({"label":"no","message":"DIAYQ-NO"})
+    buttons.append({"label":"< Yes >","message":"< Yes >"})
+    buttons.append({"label":"< No >","message":"< No >"})
     payload = {"type": "card", "cards": [{"cardTitle": random.choice(config.default_did_I_answer_your_question), "cardDescription": "", "cardImage": "https://synapxe.workvivo.com/document/link/77793", "buttons": buttons}]}
     send_message_v2(bot_userid, channel_url, sender, payload)
 
@@ -471,7 +468,7 @@ def email_data_formatting(message_content, user_details):
         index_to_track = min(indexs_holder) - 3
     
     message_content_formatted = message_content['chat_log'][index_to_track:] ## Send only a small portion of the chat logs from where the user has said No to the question.
-    message_content_formatted = [item.replace('User : DIAYQ-NO', 'User : No') for item in message_content_formatted]
+    message_content_formatted = [item.replace('User : < No >', 'User : No') for item in message_content_formatted]
     
     for item in message_content_formatted:
         text += item + " \n "
