@@ -37,10 +37,13 @@ def handling_emails(bot_userid, channel_url, sender, message):
         send_message_v2(bot_userid, channel_url, sender, wf_format.prompt_messages_format("Great! Is there anything else I can help you with today ?", ['< Yes >', '< No >']))
         
         ## Send An Email Here based on the attachment_id ##
-        mail_data = [{'sender_id': sender, 'attachment_id': message.split(email_trace)[-1]}] ## ASync Email Push
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            futures = executor.map(push_mail_with_attachment, mail_data)
-        
+        # mail_data = [{'sender_id': sender, 'attachment_id': message.split(email_trace)[-1]}] ## ASync Email Push
+        # with concurrent.futures.ThreadPoolExecutor() as executor:
+        #     futures = executor.map(push_mail_with_attachment, mail_data)
+        # push_mail_with_attachment(mail_data[0])
+
+        mail_data = {'sender_id': sender, 'attachment_id': message.split(email_trace)[-1]}
+        response = requests.request("POST", "https://reychghlum7gcuaglw57ammvb40bulpu.lambda-url.ap-southeast-1.on.aws/", headers={'Content-Type': 'application/json'}, data=json.dumps(mail_data))
         return True ## Message handled here 
     return False ## Message not handled here
     
@@ -414,7 +417,7 @@ def did_i_answer_your_question(bot_userid, channel_url, sender):
     buttons = []
     buttons.append({"label":"< Yes >","message":"< Yes >"})
     buttons.append({"label":"< No >","message":"< No >"})
-    payload = {"type": "card", "cards": [{"cardTitle": random.choice(config.default_did_I_answer_your_question), "cardDescription": "", "cardImage": "https://synapxe.workvivo.com/document/link/77793", "buttons": buttons}]}
+    payload = {"type": "card", "cards": [{"cardTitle": random.choice(config.default_did_I_answer_your_question), "cardDescription": "", "cardImage": "https://synapxe.workvivo.com/document/link/83872", "buttons": buttons}]}
     send_message_v2(bot_userid, channel_url, sender, payload)
 
 def new_hire_prompt(sender):
@@ -425,7 +428,6 @@ def new_hire_prompt(sender):
     send_message_v2(sender, {"attachment":{"type":"template","payload":{"template_type":"generic", "elements": buttons_holder}}})
 
 def click_here_to_send_file_via_email(bot_userid, channel_url, sender, attachment_id):
-    return False ## Remove this
     buttons = [{"label":"Yes, email me","message":attachment_id}]
     payload = {"type": "card", "cards": [{"cardTitle": random.choice(config.default_email_sending_question), "cardDescription": "", "cardImage": "https://synapxe.workvivo.com/document/link/77792", "buttons": buttons}]}
     send_message_v2(bot_userid, channel_url, sender, payload)

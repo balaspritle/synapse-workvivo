@@ -4,7 +4,7 @@ load_dotenv(dotenv_path='.env')
 # from fastapi import FastAPI, Request
 from flask import Flask, request, send_file, render_template, session, make_response
 from flask_talisman import Talisman
-import json, secrets, os, concurrent.futures
+import json, secrets, os, concurrent.futures, ast
 import utility.utils as utils
 import utility.mail_service_v2 as mail_service
 import utility.config as config_
@@ -101,6 +101,14 @@ def consolidated_mail_send():
             print("Error occured consolidated_mail_send", str(e))
     return render_template('index.html', form=form)
 
+
+@app.route("/sendEmailAttachment" , methods=['POST'])
+def send_email_attachment():
+    if request.method == 'POST':
+        payload = request.json
+        print("Incoming payload at send_email_attachment", payload)
+        utils.push_mail_with_attachment(ast.literal_eval(str(payload)))
+    return {"status":  "Mail Sent"}
 
 # if __name__ == "__main__":
 #     app.run(host='0.0.0.0', port=8080)
