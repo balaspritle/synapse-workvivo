@@ -35,11 +35,11 @@ def fetch_user_email(id_):
     if id_ in user_email_cache:
         return user_email_cache[id_]
 
-    print("Getting user email id")
     url = os.getenv("WORKVIVO_API_URL").split('chat/bots/message')[0] + f"users/{str(id_)}"
     response = requests.request("GET", url, headers=headers, data={}).json()
     email = response['data']['email']
     user_email_cache[id_] = email
+    print("Getting user email id", id_, email)
     return email
 
-# print(">>>>", get_user_data('3003104378'))
+# print(">>>>", fetch_user_email('3002982982'))

@@ -43,7 +43,7 @@ class WORKVIVO_FORMATTER:
           # mapper = {'< Yes >':'Yes', '< No >':'No'}
           # buttons = [{"label":mapper[str(prompt)],"message":str(prompt)} for prompt in prompts]
           buttons = [{"label":str(prompt),"message":str(prompt)} for prompt in prompts]
-          return {"type": "card", "cards": [{"cardTitle": complete_message, "cardDescription": "", "cardImage": "https://synapxe.workvivo.com/document/link/77793", "buttons": buttons}]}
+          return {"type": "card", "cards": [{"cardTitle": complete_message, "cardDescription": "", "cardImage": "https://synapxe.workvivo.com/document/link/83872", "buttons": buttons}]}
         # else:
         #   buttons = [{"label":str(prompt),"message":str(prompt)} for prompt in prompts ]
         #   return {"type": "card", "cards": [{"cardTitle": complete_message, "cardDescription": "", "cardImage": "", "buttons": buttons}]}
@@ -54,7 +54,7 @@ class WORKVIVO_FORMATTER:
         
         if len(buttons) > 10:
           buttons = buttons[0:9] + buttons[-1:] # Limit to 10 carousels only to adhere facebook workplace limitation
-        return {"type": "card", "cards": [{"cardTitle": complete_message, "cardDescription": "", "cardImage": "https://synapxe.workvivo.com/document/link/77793", "buttons": buttons}]}
+        return {"type": "card", "cards": [{"cardTitle": complete_message, "cardDescription": "", "cardImage": "https://synapxe.workvivo.com/document/link/83872", "buttons": buttons}]}
     return False
 
   def image_format(self, images):
@@ -69,7 +69,7 @@ class WORKVIVO_FORMATTER:
             {
               "cardTitle": "Please click the button to view the image",
               "cardDescription": "",
-              "cardImage": "https://synapxe.workvivo.com/document/link/77793",
+              "cardImage": "https://synapxe.workvivo.com/document/link/83872",
               "buttons": [
                 {'label': 'Image File', 'link': attachment_mapper(image_id, "image")}
               ]
@@ -87,7 +87,7 @@ class WORKVIVO_FORMATTER:
             {
               "cardTitle": "Please click the button to view the file",
               "cardDescription": "",
-              "cardImage": "https://synapxe.workvivo.com/document/link/77791",
+              "cardImage": "https://synapxe.workvivo.com/document/link/83872",
               "buttons": [
                 {'label' : 'File', 'link' : attachment_mapper(file_id, "file")}
               ]

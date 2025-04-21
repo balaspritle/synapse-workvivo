@@ -34,7 +34,7 @@ headersList = {"Accept": "*/*",  "Accept": "application/json", "Workvivo-Id": WO
 def handling_emails(bot_userid, channel_url, sender, message):
     if(email_trace in message):
         send_message_v2(bot_userid, channel_url, sender, wf_format.message_format(random.choice(config.default_mail_sent_message)))
-        send_message_v2(bot_userid, channel_url, sender, wf_format.prompt_messages_format("Great! Is there anything else I can help you with today ?", ['< Yes >', '< No >']))
+        send_message_v2(bot_userid, channel_url, sender, wf_format.prompt_messages_format(random.choice(config.default_did_I_answer_your_question), ['< Yes >', '< No >']))
         
         ## Send An Email Here based on the attachment_id ##
         # mail_data = [{'sender_id': sender, 'attachment_id': message.split(email_trace)[-1]}] ## ASync Email Push
@@ -429,7 +429,7 @@ def new_hire_prompt(sender):
 
 def click_here_to_send_file_via_email(bot_userid, channel_url, sender, attachment_id):
     buttons = [{"label":"Yes, email me","message":attachment_id}]
-    payload = {"type": "card", "cards": [{"cardTitle": random.choice(config.default_email_sending_question), "cardDescription": "", "cardImage": "https://synapxe.workvivo.com/document/link/77792", "buttons": buttons}]}
+    payload = {"type": "card", "cards": [{"cardTitle": random.choice(config.default_email_sending_question), "cardDescription": "", "cardImage": "https://synapxe.workvivo.com/document/link/83872", "buttons": buttons}]}
     send_message_v2(bot_userid, channel_url, sender, payload)
 
 def payload_preprocess(payload):
