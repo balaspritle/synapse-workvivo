@@ -7,8 +7,8 @@ import concurrent.futures
 from collections import namedtuple
 
 WORKVIVO_API_URL = os.getenv("WORKVIVO_API_URL")
-WORKVIVO_ID = os.getenv("WORKVIVO_ID")  # Set in env variables
-WORKVIVO_TOKEN = os.getenv("WORKVIVO_TOKEN")  # Bearer token
+WORKVIVO_ID = os.getenv("WORKVIVO_ID")
+WORKVIVO_TOKEN = os.getenv("WORKVIVO_TOKEN")
 ECHO_BOT = ast.literal_eval(os.getenv("ECHO_BOT"))
 GAME_MODE = ast.literal_eval(os.getenv("GAME_MODE"))
 
@@ -428,6 +428,7 @@ def new_hire_prompt(sender):
     send_message_v2(sender, {"attachment":{"type":"template","payload":{"template_type":"generic", "elements": buttons_holder}}})
 
 def click_here_to_send_file_via_email(bot_userid, channel_url, sender, attachment_id):
+    return False ## Disable this line to enable this function
     buttons = [{"label":"Yes, email me","message":attachment_id}]
     payload = {"type": "card", "cards": [{"cardTitle": random.choice(config.default_email_sending_question), "cardDescription": "", "cardImage": "https://synapxe.workvivo.com/document/link/83872", "buttons": buttons}]}
     send_message_v2(bot_userid, channel_url, sender, payload)
@@ -487,7 +488,8 @@ def get_workvivo_user_data(sender_id):
 def push_mail(data):
     try:
         # user_data = fb_workplace.get_user_data(data['sender_id'])
-        user_data = get_workvivo_user_data(data['sender_id'])
+        # user_data = get_workvivo_user_data(data['sender_id'])
+        user_data = workvivo_utils.get_user_data(data['sender_id'])
         mail_service.sendEmail("ChatBot Query", str(email_data_formatting(data, user_data)))
         
         timestamp = str(datetime.datetime.strftime(datetime.datetime.now(pytz.timezone('Asia/Singapore')), "%Y-%m-%d"))

@@ -50,16 +50,16 @@ def webhook():
             channel_url = payload.get("message", {}).get("channel_url")
             user_email = payload.get("message", {}).get("user_email")
             print(">>> 1", bot_userid, text, channel_url, user_email)
+            utils.respond(bot_userid, channel_url, user_email, text)
+        # else:
+        #     bot_userid = payload.get("bot", {}).get("bot_userid")
+        #     text = payload.get("message", {}).get("text")
+        #     channel_url = payload.get("channel", {}).get("channel_url")
+        #     user_email = payload.get("sender", {}).get("user_id")
+        #     print(">>> 2", bot_userid, text, channel_url, user_email)
 
-            return utils.respond(bot_userid, channel_url, user_email, text)
-        else:
-            bot_userid = payload.get("bot", {}).get("bot_userid")
-            text = payload.get("message", {}).get("text")
-            channel_url = payload.get("channel", {}).get("channel_url")
-            user_email = payload.get("sender", {}).get("user_id")
-            print(">>> 2", bot_userid, text, channel_url, user_email)
-
-            return utils.respond(bot_userid, channel_url, user_email, text)
+        #     return utils.respond(bot_userid, channel_url, user_email, text)
+        return {"status": "ok"}
 
 
 @app.route('/iris_analytics_trigger', methods=['GET'])
