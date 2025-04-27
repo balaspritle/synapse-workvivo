@@ -122,14 +122,12 @@ def db_filtering(duration, table_name):
         return pd.DataFrame()
 
 def get_user_email(row, user_id_to_email_mapper):
-    # user_id_variants = ['UserId', 'user_id', 'UserId', 'Unique User_Id']
-    # try:
-    #     for user_id_variant in user_id_variants:
     try:
         return fetch_user_email(str(row['user_id']))
     except Exception as e:
-        print("Error in get_user_email", str(e), row)
-        return "N/A"
+        print("Error in get_user_email", str(e), row['user_id'])
+        # return "N/A"
+        return str(row['user_id'])
     
 
 def utc_to_sgt(row):

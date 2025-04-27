@@ -33,14 +33,14 @@ def azure_bot_response(user_question, userId = "Zevigo Middleware"):
 
 
 def azure_bot_response_cqa(user_question, userId = "Zevigo Middleware"):
-    if config.use_cache:
-        cache_resp = cache_mechanism.get_from_cache(user_question, userId)
-        if cache_resp:
-            return cache_resp
+    # if config.use_cache:
+    #     cache_resp = cache_mechanism.get_from_cache(user_question.lower(), userId)
+    #     if cache_resp:
+    #         return cache_resp
     Headers = { "Ocp-Apim-Subscription-Key" : config.azure_bot_authorization_token, "Content-Type" : "application/json" }
     payload = {"question": user_question, "top": config.maximum_suggestions, "confidenceScoreThreshold": config.suggestions_threshold, "userId" : userId }
     azure_bot_response = transform_to_qnamaker_format(json.loads(requests.post(config.azure_bot_url, headers = Headers, json = payload).text))
-    cache_mechanism.save_to_cache(user_question.lower(), azure_bot_response)
+    # cache_mechanism.save_to_cache(user_question.lower(), azure_bot_response)
     return azure_bot_response
 
 # question = 'medical leave'

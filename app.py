@@ -6,6 +6,7 @@ from flask import Flask, request, send_file, render_template, session, make_resp
 from flask_talisman import Talisman
 import json, secrets, os, concurrent.futures, ast
 import utility.utils as utils
+import utility.workvivo as workvivo_utils
 import utility.mail_service_v2 as mail_service
 import utility.config as config_
 
@@ -34,6 +35,35 @@ def clear_cache():
     return {"status":  "Cache Cleared"}
 
 
+# @app.route("/webhook" ,methods=['POST'])
+# def webhook():
+#     """
+#     Workvivo webhook that listens for messages and responds accordingly.
+#     """
+#     if request.method == 'POST':
+#         payload = request.json
+
+#         print("Incoming payload >>>", payload)
+        
+#         if "action" in payload.keys():
+#             bot_userid = payload.get("message", {}).get("bot_userid")
+#             text = payload.get("message", {}).get("message")
+#             channel_url = payload.get("message", {}).get("channel_url")
+#             user_email = payload.get("message", {}).get("user_email")
+#             print(">>> 1", bot_userid, text, channel_url, user_email)
+#             utils.respond(bot_userid, channel_url, user_email, text)
+#         # else:
+#         #     bot_userid = payload.get("bot", {}).get("bot_userid")
+#         #     text = payload.get("message", {}).get("text")
+#         #     channel_url = payload.get("channel", {}).get("channel_url")
+#         #     user_email = payload.get("sender", {}).get("user_id")
+#         #     print(">>> 2", bot_userid, text, channel_url, user_email)
+
+#         #     return utils.respond(bot_userid, channel_url, user_email, text)
+#         return {"status": "ok"}
+
+
+user_last_messages = {}
 @app.route("/webhook" ,methods=['POST'])
 def webhook():
     """
@@ -50,15 +80,18 @@ def webhook():
             channel_url = payload.get("message", {}).get("channel_url")
             user_email = payload.get("message", {}).get("user_email")
             print(">>> 1", bot_userid, text, channel_url, user_email)
-            utils.respond(bot_userid, channel_url, user_email, text)
-        # else:
-        #     bot_userid = payload.get("bot", {}).get("bot_userid")
-        #     text = payload.get("message", {}).get("text")
-        #     channel_url = payload.get("channel", {}).get("channel_url")
-        #     user_email = payload.get("sender", {}).get("user_id")
-        #     print(">>> 2", bot_userid, text, channel_url, user_email)
-
-        #     return utils.respond(bot_userid, channel_url, user_email, text)
+        else:
+            bot_userid = payload.get("bot", {}).get("bot_userid")
+            text = payload.get("message", {}).get("text")
+            channel_url = payload.get("channel", {}).get("channel_url")
+            user_email = workvivo_utils.fetch_user_email(payload.get("sender", {}).get("user_id"))
+            print(">>> 2", bot_userid, text, channel_url, user_email)
+        
+        if user_email in user_last_messages and user_last_messages[user_email] == text:
+            print(f"Duplicate message detected for user {user_email}, skipping respond...")
+        else:
+            user_last_messages[user_email] = text
+            return utils.respond(bot_userid, channel_url, user_email, text)
         return {"status": "ok"}
 
 

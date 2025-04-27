@@ -1,4 +1,4 @@
-import time, random, json, os, datetime, pytz
+import time, random, json, os, datetime, pytz, re, ast
 import utility.config as config
 from flask_wtf import FlaskForm
 from wtforms.fields import DateField, IntegerField
@@ -13,6 +13,16 @@ class InfoForm(FlaskForm):
     days = IntegerField('Days', validators=[validators.Optional(),])
     submit = SubmitField('Submit')
   
+def replacer(match):
+    url = match.group(0)
+    url = url.replace('.', '[dot]')
+    return url
+
+def mask_urls(text):
+    if ast.literal_eval(os.getenv("MASK_URL")):
+        url_pattern = r'https?://\S+'
+        return re.sub(url_pattern, replacer, text)
+    return text
 
 class WORKVIVO_FORMATTER:
   def __init__(self):
@@ -23,7 +33,7 @@ class WORKVIVO_FORMATTER:
       complete_message = ""
       for message in messages:
         complete_message += message
-      return {"type": "message", "message": complete_message}
+      return {"type": "message", "message": mask_urls(complete_message)}
     return False
 
   def prompt_messages_format(self, prompt_messages, prompts): 

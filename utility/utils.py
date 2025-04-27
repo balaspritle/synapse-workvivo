@@ -1,7 +1,7 @@
 import utility.config as config, utility.azure_bot as azure_bot, utility.db_utils as db_utils, utility.workvivo as workvivo_utils, utility.mail_service_v2 as mail_service
 from utility.attachments import attachment_mapper_swapped
 from utility.datastructures import WORKVIVO_FORMATTER, DATA_COLLECTOR
-import requests, random, datetime, pytz, time, os, json, ast
+import requests, random, datetime, pytz, time, os, json, ast, re
 import numpy as np
 import concurrent.futures    
 from collections import namedtuple
@@ -449,6 +449,16 @@ def payload_preprocess(payload):
   except:
     return "Bot : " + str(payload)
  
+def mask_urls_remove_https(text):
+    url_pattern = r'https?://\S+'
+    
+    def replacer(match):
+        url = match.group(0)
+        # Remove https:// and replace . with [dot]
+        url = url.replace('https://', '').replace('http://', '').replace('.', '[dot]')
+        return url
+
+    return re.sub(url_pattern, replacer, text)
 
 def email_data_formatting(message_content, user_details):
     print("email_data_formatting inputs", message_content, user_details)
@@ -475,7 +485,7 @@ def email_data_formatting(message_content, user_details):
     
     for item in message_content_formatted:
         text += item + " \n "
-    return text
+    return mask_urls_remove_https(text)
 
 def get_workvivo_user_data(sender_id):
     ## Get User's Details with error handling ##
@@ -489,7 +499,8 @@ def push_mail(data):
     try:
         # user_data = fb_workplace.get_user_data(data['sender_id'])
         # user_data = get_workvivo_user_data(data['sender_id'])
-        user_data = workvivo_utils.get_user_data(data['sender_id'])
+        print("push_mail >>>", data)
+        user_data = data['sender_id']
         mail_service.sendEmail("ChatBot Query", str(email_data_formatting(data, user_data)))
         
         timestamp = str(datetime.datetime.strftime(datetime.datetime.now(pytz.timezone('Asia/Singapore')), "%Y-%m-%d"))
@@ -503,7 +514,8 @@ def push_mail(data):
 
 def push_mail_with_attachment(data):
     try:
-        user_data = get_workvivo_user_data(data['sender_id'])
+        # user_data = get_workvivo_user_data(data['sender_id'])
+        user_data = data['sender_id']
         mail_service.sendEmailWithAttachment(user_data, data['attachment_id'])
     except Exception as e:
         print(e)

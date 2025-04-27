@@ -1,7 +1,7 @@
 import os, ast
 
 ## Set it to False for Titan and True for Pierce
-use_cache = True
+use_cache = False
 debug = False
 
 ## Pierce - IHIS

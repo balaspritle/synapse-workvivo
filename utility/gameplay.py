@@ -1,7 +1,7 @@
 import random, pytz, requests, json, os, string
 from datetime import datetime
 from utility.datastructures import WORKVIVO_FORMATTER
-from utility.workvivo import get_user_data
+from utility.workvivo import get_user_data, fetch_user_email
 import utility.db_utils as db_utils
 
 alphabets_mapper = {index : item for index, item in enumerate(list(string.ascii_uppercase))}
@@ -63,7 +63,7 @@ def send_message_v2(bot_userid, channel_url, message_payload):
 class scorer:
   def __init__(self, user_id, total_questions_count):
     self.lot = list(range(1, total_questions_count + 1))
-    self.user_data = get_user_data(user_id)
+    self.user_data = fetch_user_email(user_id)
     self.question_id = []
     self.questions = []
     self.actual_answers = []
@@ -181,7 +181,8 @@ class gamezone:
     datestamp = str(datetime.strftime(datetime.now(pytz.timezone('Asia/Singapore')), "%Y-%m-%d"))                
     timestamp = str(datetime.strftime(datetime.now(pytz.timezone('Asia/Singapore')), "%H:%M:%S"))
     
-    db_utils.insert_data_into_db_save_game_log(datestamp, timestamp, holder['user_data']['id'], len(holder['scores']))
+    # db_utils.insert_data_into_db_save_game_log(datestamp, timestamp, holder['user_data']['id'], len(holder['scores']))
+    db_utils.insert_data_into_db_save_game_log(datestamp, timestamp, holder['user_data'], len(holder['scores']))
 
   def game_triggered(self, bot_userid, channel_url, user_id, message):
     if message in self.gameplay_trigger_keyword:
