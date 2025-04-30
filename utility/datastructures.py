@@ -15,7 +15,7 @@ class InfoForm(FlaskForm):
   
 def replacer(match):
     url = match.group(0)
-    url = url.replace('.', '[dot]')
+    url = url.replace('.', '.\u200B').replace('/', '/\u200B') #Insert zero-width space after dots and slashes
     return url
 
 def mask_urls(text):
