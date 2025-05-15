@@ -38,7 +38,11 @@ images_attache = {
     "297801119440339": "https://synapxe.workvivo.com/document/link/92927",
     "297801119440340": "https://synapxe.workvivo.com/document/link/92929",
     "297801119440341": "https://synapxe.workvivo.com/document/link/92880",
-    "297801119440342" : "https://synapxe.workvivo.com/document/link/92928"
+    "297801119440342" : "https://synapxe.workvivo.com/document/link/92928",
+    "297801119440343" : "https://synapxe.workvivo.com/document/link/95305",
+    "297801119440344" : "https://synapxe.workvivo.com/document/link/95307",
+    "297801119440345" : "https://synapxe.workvivo.com/document/link/95306",
+    "297801119440346" : "https://synapxe.workvivo.com/document/link/95308"
 }
 
 files_attache = {
