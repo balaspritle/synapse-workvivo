@@ -417,7 +417,7 @@ def did_i_answer_your_question(bot_userid, channel_url, sender):
     buttons = []
     buttons.append({"label":"< Yes >","message":"< Yes >"})
     buttons.append({"label":"< No >","message":"< No >"})
-    payload = {"type": "card", "cards": [{"cardTitle": random.choice(config.default_did_I_answer_your_question), "cardDescription": "", "cardImage": "https://synapxe.workvivo.com/document/link/83872", "buttons": buttons}]}
+    payload = {"type": "card", "cards": [{"cardTitle": random.choice(config.default_did_I_answer_your_question), "cardDescription": "", "cardImage": "https://synapxe.workvivo.com/document/link/95275", "buttons": buttons}]}
     send_message_v2(bot_userid, channel_url, sender, payload)
 
 def new_hire_prompt(sender):
@@ -430,7 +430,7 @@ def new_hire_prompt(sender):
 def click_here_to_send_file_via_email(bot_userid, channel_url, sender, attachment_id):
     return False ## Disable this line to enable this function
     buttons = [{"label":"Yes, email me","message":attachment_id}]
-    payload = {"type": "card", "cards": [{"cardTitle": random.choice(config.default_email_sending_question), "cardDescription": "", "cardImage": "https://synapxe.workvivo.com/document/link/83872", "buttons": buttons}]}
+    payload = {"type": "card", "cards": [{"cardTitle": random.choice(config.default_email_sending_question), "cardDescription": "", "cardImage": "https://synapxe.workvivo.com/document/link/95275", "buttons": buttons}]}
     send_message_v2(bot_userid, channel_url, sender, payload)
 
 def payload_preprocess(payload):
