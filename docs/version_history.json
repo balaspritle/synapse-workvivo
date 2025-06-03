@@ -16,5 +16,6 @@
     "V1.0.14" : "bug fixes",
     "V1.0.15" : "final bug fixes",
     "V1.0.16" : "kb updates",
-    "v1.0.17" : "mask url removed"
+    "v1.0.17" : "mask url removed",
+    "v1.0.18" : "strip text bug fix"
 }

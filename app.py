@@ -79,18 +79,18 @@ def webhook():
             text = payload.get("message", {}).get("message")
             channel_url = payload.get("message", {}).get("channel_url")
             user_email = payload.get("message", {}).get("user_email")
-            print(">>> 1", bot_userid, text, channel_url, user_email)
+            print(">>> 1", text, user_email, user_last_messages)
         else:
             bot_userid = payload.get("bot", {}).get("bot_userid")
             text = payload.get("message", {}).get("text")
             channel_url = payload.get("channel", {}).get("channel_url")
             user_email = workvivo_utils.fetch_user_email(payload.get("sender", {}).get("user_id"))
-            print(">>> 2", bot_userid, text, channel_url, user_email)
+            print(">>> 2", text, user_email, user_last_messages)
         
-        if user_email in user_last_messages and user_last_messages[user_email] == text:
+        if user_email in user_last_messages and user_last_messages[user_email] == text.strip():
             print(f"Duplicate message detected for user {user_email}, skipping respond...")
         else:
-            user_last_messages[user_email] = text
+            user_last_messages[user_email] = text.strip()
             return utils.respond(bot_userid, channel_url, user_email, text)
         return {"status": "ok"}
 
