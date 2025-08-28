@@ -218,8 +218,8 @@ def respond(bot_userid, channel_url, sender, message):
         response = azure_bot.azure_bot_response_cqa(message, sender)
         formatted_response = postprocess_azure_response_v2(bot_userid, channel_url, sender, response, returning_user_data_holder)
         messages, prompts, images, files, did_i_answer_your_question_flag = formatted_response.messages, formatted_response.prompts, formatted_response.images,  formatted_response.files,  formatted_response.did_i_answer_your_question_flag
-        if config.debug:
-            print("messages, prompts, images, did_i_answer_your_question_flag", messages, prompts, images, did_i_answer_your_question_flag, "\n")
+        
+        print("messages, prompts, images, did_i_answer_your_question_flag", messages, prompts, images, did_i_answer_your_question_flag, "\n")
         if messages:
             response = send_message_v2(bot_userid, channel_url, sender, messages)
             if not images and not files and did_i_answer_your_question_flag:

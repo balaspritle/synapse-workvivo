@@ -65,6 +65,8 @@ class WORKVIVO_FORMATTER:
         
         if len(buttons) > 10:
           buttons = buttons[0:9] + buttons[-1:] # Limit to 10 carousels only to adhere facebook workplace limitation
+        
+        complete_message = re.sub(r'\n\s*\n', '\n\n', re.sub(r'!\[.*?\]\(\d+\)', '', complete_message)).strip()
         return {"type": "card", "cards": [{"cardTitle": complete_message, "cardDescription": "", "cardImage": "https://synapxe.workvivo.com/document/link/95275", "buttons": buttons}]}
     return False
 

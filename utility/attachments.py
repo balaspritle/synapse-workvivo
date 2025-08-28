@@ -42,7 +42,13 @@ images_attache = {
     "297801119440343" : "https://synapxe.workvivo.com/document/link/95305",
     "297801119440344" : "https://synapxe.workvivo.com/document/link/95307",
     "297801119440345" : "https://synapxe.workvivo.com/document/link/95306",
-    "297801119440346" : "https://synapxe.workvivo.com/document/link/95308"
+    "297801119440346" : "https://synapxe.workvivo.com/document/link/95308",
+    "297801119440347" : "https://synapxe.workvivo.com/document/link/162798",
+    "297801119440348" : "https://synapxe.workvivo.com/document/link/162806",
+    "297801119440349" : "https://synapxe.workvivo.com/document/link/162800",
+    "297801119440350" : "https://synapxe.workvivo.com/document/link/162803",
+    "297801119440351" : "https://synapxe.workvivo.com/document/link/162801",
+    "297801119440352" : "https://synapxe.workvivo.com/document/link/162804"
 }
 
 files_attache = {
@@ -71,6 +77,9 @@ files_attache = {
     "630218859209166": "https://synapxe.workvivo.com/document/link/91141",
     "630218859209167": "https://synapxe.workvivo.com/document/link/92882",
     "630218859209168": "https://synapxe.workvivo.com/document/link/92885",
+    "630218859209169": "https://synapxe.workvivo.com/document/link/162805",
+    "630218859209170": "https://synapxe.workvivo.com/document/link/162799",
+    "630218859209171": "https://synapxe.workvivo.com/document/link/162802"
 }
 
 files_attache_swapped = {v: k for k, v in files_attache.items()}
