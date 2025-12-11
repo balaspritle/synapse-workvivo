@@ -18,5 +18,6 @@
     "V1.0.16" : "kb updates",
     "v1.0.17" : "mask url removed",
     "v1.0.18" : "strip text bug fix",
-    "v1.0.19" : "new attachments added and other bug fixes"
+    "v1.0.19" : "new attachments added and other bug fixes",
+    "v1.0.20" : "bug fixes in 3 consecutive no email logic"
 }

@@ -19,7 +19,7 @@ sgt_timezone = pytz.timezone('Asia/Singapore')
 
 # SendGrid Mail Sender
 def sendEmail(subject, content):
-    # print("Sending an email", subject, content)
+    print("Sending an email", subject, content)
     for sender_email_ in config.sender_email:
         print("sender_email_", sender_email_)
         try:

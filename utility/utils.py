@@ -451,10 +451,9 @@ def payload_preprocess(payload):
  
 def mask_urls_remove_https(text):
     url_pattern = r'https?://\S+'
-    
+
     def replacer(match):
         url = match.group(0)
-        # Remove https:// and replace . with [dot]
         url = url.replace('https://', '').replace('http://', '').replace('.', '[dot]')
         return url
 
@@ -462,29 +461,39 @@ def mask_urls_remove_https(text):
 
 def email_data_formatting(message_content, user_details):
     print("email_data_formatting inputs", message_content, user_details)
-
     text = ""
     text += "** USER DETAILS **\n"
     text += str(user_details)
-    # for k,v in user_details.items():
-    #     text += k + " : " + v + "\n"
     text += "\n\n"
-    
     text += "** CHAT LOGS **\n"
-    
+
+    chat_log = message_content['chat_log']
+
+    # Find all indices where user said "No" (looking for "User : < No >" or "User : No")
+    no_indices = []
+    for i, message in enumerate(chat_log):
+        if 'User :' in message and any(sm in message for sm in special_messages[:2]):
+            no_indices.append(i)
+
+    # Default: start from beginning
     index_to_track = 0
-    indexs_holder = []
-    for message in message_content['chat_log']:
-        if any(sm in message for sm in special_messages[0:2]):
-            indexs_holder.append(message_content['chat_log'].index(message))
-    if(indexs_holder):
-        index_to_track = min(indexs_holder) - 3
-    
-    message_content_formatted = message_content['chat_log'][index_to_track:] ## Send only a small portion of the chat logs from where the user has said No to the question.
+
+    if len(no_indices) >= 3:
+        # User said No 3+ times - take context from 3rd-to-last "No"
+        # This captures the last 3 Q&A exchanges where user was dissatisfied
+        third_last_no_idx = no_indices[-3]
+        # Go back a few messages to capture the question that led to first "No"
+        index_to_track = max(0, third_last_no_idx - 3)
+    elif no_indices:
+        # Less than 3 "No"s - take from first "No" with some context
+        index_to_track = max(0, no_indices[0] - 4)
+
+    message_content_formatted = chat_log[index_to_track:]
     message_content_formatted = [item.replace('User : < No >', 'User : No') for item in message_content_formatted]
-    
+
     for item in message_content_formatted:
         text += item + " \n "
+
     return mask_urls_remove_https(text)
 
 def get_workvivo_user_data(sender_id):
@@ -551,35 +560,3 @@ def find_three_consecutive_not_found(chat_log, catch_phrases = config.default_fa
     return True
   else:
     return False
-
-def welcome_new_hires():    
-    users_to_trigger_list = ["rebecca.low@ihis.com.sg", "REESHMINI.VIJEYAKUMAR@IHIS.COM.SG"]
-    users_to_trigger_dict = {}    
-    all_fb_users = fb_workplace.get_all_user_id()
-    email_to_user_id_mapper = {}
-    for user in all_fb_users:
-        email_to_user_id_mapper[user['email']] = user['id']
-    # users_to_trigger = {'balakrishnav': '100077347014829'}
-    
-    for user_to_trigger in users_to_trigger_list:
-        user_to_trigger = user_to_trigger.lower().strip()
-        user_id = email_to_user_id_mapper.get(user_to_trigger, None)
-        if user_id:
-            users_to_trigger_dict[user_to_trigger] = user_id
-        else:
-            print("user_id not available for : {}".format(user_to_trigger))
-    new_hires = list(users_to_trigger_dict.values())
-    print("new_hires : {}".format(new_hires))
-    
-    for new_hire in new_hires:
-        send_message_v2(new_hire,  wf_format.message_format(random.choice(config.default_new_hire_welcome_message)))
-        new_hire_prompt(new_hire)
-        time.sleep(3)
-        
-# scheduler = BackgroundScheduler(timezone=config.timezone)
-# scheduler.start()
-# scheduler.add_job(
-#     welcome_new_hires, 
-#     'date', 
-#     run_date=datetime.datetime(2022, 9, 6, 9, 1, 1)
-#     )

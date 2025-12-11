@@ -2,7 +2,7 @@ import os, ast
 
 ## Set it to False for Titan and True for Pierce
 use_cache = False
-debug = False
+debug = ast.literal_eval(os.getenv("DEBUG_MODE")) # True or False
 
 ## Pierce - IHIS
 # Credentials for Azure
