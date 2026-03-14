@@ -88,3 +88,10 @@ You should see actual data in the `df from log analytics` output instead of an e
 ## Setting a Reminder
 
 Set a calendar reminder ~2 weeks before the new secret's expiry date to avoid downtime.
+
+
+## Data Retention
+https://portal.azure.com/#@ZevigoSolutions728.onmicrosoft.com/resource/subscriptions/3d06e7d1-0ef1-45d9-ab16-6fdd37a8ac1f/resourceGroups/zevigo-synapse-cqna/providers/Microsoft.OperationalInsights/workspaces/zevigo-synapse-cqna-log-analytics/usageAndCosts
+
+## Certificates and Secrets
+https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Credentials/appId/70f438b0-f78d-438d-a5f4-f611578251bf/isMSAApp~/false

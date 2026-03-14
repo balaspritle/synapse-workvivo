@@ -155,7 +155,7 @@ def chatlog_formatter(df, user_id_to_email_mapper):
     df = df[['date', 'Time', 'user_id', 'question', 'answer', 'score']]
     df = df[~df.user_id.isin(user_id_to_remove)]
     df = df[~df.question.isin(ignore_phrases)]
-    df['User Email'] = df.apply(get_user_email, user_id_to_email_mapper = user_id_to_email_mapper, axis = 1)
+    # df['User Email'] = df.apply(get_user_email, user_id_to_email_mapper = user_id_to_email_mapper, axis = 1)
     return df 
 
 def extract_time(row):
@@ -223,10 +223,11 @@ def sendWeeklyChatLogs(duration, user_id_to_email_mapper):
         df = df.dropna()
         df_cleaned = chatlog_formatter(df, user_id_to_email_mapper)
         
-        try:
-            df_cleaned = add_cache_data(df_cleaned, user_id_to_email_mapper, duration)
-        except Exception as e:
-            print("Error in add_cache_data", e)            
+        # Cache is disabled (config.use_cache = False), so no cache data to merge
+        # try:
+        #     df_cleaned = add_cache_data(df_cleaned, user_id_to_email_mapper, duration)
+        # except Exception as e:
+        #     print("Error in add_cache_data", e)
         
         return df_cleaned, df, timespan_original
     except Exception as e:
@@ -299,8 +300,8 @@ def func_graph_3(df, user_id_to_email_mapper):
             holder.append(tuple([date_, user_id_, df[(df.date == date_) & (df.user_id == user_id_)].shape[0]])) 
             
     df1_graph_3 = pd.DataFrame(holder, columns=['date', 'user_id', 'Count of queries by Users'])
-    df1_graph_3['User Email'] =  df1_graph_3.apply(get_user_email, user_id_to_email_mapper = user_id_to_email_mapper, axis = 1)
-    df1_graph_3 = df1_graph_3[['date', 'user_id', 'User Email', 'Count of queries by Users']]
+    # df1_graph_3['User Email'] =  df1_graph_3.apply(get_user_email, user_id_to_email_mapper = user_id_to_email_mapper, axis = 1)
+    df1_graph_3 = df1_graph_3[['date', 'user_id', 'Count of queries by Users']]
     return df1_graph_3
 
 def func_graph_4(df):
@@ -403,7 +404,7 @@ def consolidated_analytics(duration):
     df4 = func_graph_6(df4)  
 
     ## Graph - 7 - df1 as it is
-    df1 = df1[['date', 'Time', 'user_id', 'User Email', 'question', 'answer', 'score']]
+    df1 = df1[['date', 'Time', 'user_id', 'question', 'answer', 'score']]
 
     ## Graph - 8 - df2 postprocessing
     df2 = func_graph_8(df2, user_id_to_email_mapper)

@@ -27,7 +27,7 @@ AzureDiagnostics
 | project TimeGenerated, user_id, question_, answer_, score_, kbId_
 """ + f'| where kbId_=="{kb_id}"'
 
-print("Azure Log Query", query)
+# print("Azure Log Query", query)
 
 def query_log_analytics(timespan):
     """
@@ -54,7 +54,7 @@ def query_log_analytics(timespan):
     # Create Log Analytics client
     client = LogsQueryClient(credential)
     column_names = ['timestamp', 'user_id', 'question', 'answer', 'score', 'KbId']
-    
+    print("Executing Azure Log Analytics query...", timespan)
     try:
         # Execute the query
         response = client.query_workspace(
@@ -72,6 +72,7 @@ def query_log_analytics(timespan):
                     columns=column_names
                 )
                 df['Date'] = df.apply(date2str_v2, axis=1)
+                print(f"Query successful, retrieved {len(df)} rows")
                 return df
             else:
                 print("Query returned no data")
