@@ -446,6 +446,13 @@ def consolidated_analytics(duration):
         df5.to_excel(writer, sheet_name='Game Reports',index=False)
 
     shoot_email(attachment_filepath)
+
+    try:
+        s3_key = "iris-bot-conversation-logs-workvivo/" + final_df_file_name
+        aws.upload_to_s3(attachment_filepath, "ihis-kbs", s3_key)
+    except Exception as e:
+        print("Error uploading to S3", e)
+
     user_id_to_email_mapper.clear()
 
 def all_weekly_mails(duration = 7):

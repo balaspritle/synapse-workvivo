@@ -89,9 +89,32 @@ You should see actual data in the `df from log analytics` output instead of an e
 
 Set a calendar reminder ~2 weeks before the new secret's expiry date to avoid downtime.
 
+---
 
-## Data Retention
-https://portal.azure.com/#@ZevigoSolutions728.onmicrosoft.com/resource/subscriptions/3d06e7d1-0ef1-45d9-ab16-6fdd37a8ac1f/resourceGroups/zevigo-synapse-cqna/providers/Microsoft.OperationalInsights/workspaces/zevigo-synapse-cqna-log-analytics/usageAndCosts
+## Data Retention Settings
 
-## Certificates and Secrets
-https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Credentials/appId/70f438b0-f78d-438d-a5f4-f611578251bf/isMSAApp~/false
+Azure Log Analytics has a configurable data retention period. Data older than the retention period is automatically purged and **cannot be recovered**. As of March 2026, retention is set to **730 days**.
+
+### How to Change Data Retention
+
+1. Go to [Azure Portal](https://portal.azure.com)
+2. Search for **Log Analytics workspaces** in the top search bar
+3. Click **zevigo-synapse-cqna-log-analytics**
+4. In the left sidebar, click **Usage and estimated costs**
+5. At the top of the page, click the **Data Retention** button (in the top toolbar, not the sidebar)
+6. A panel will open on the right with a slider — set the number of days (max 730)
+7. Click **OK**
+
+> **Note:** Retention beyond 31 days incurs additional cost per GB/month on the pay-as-you-go plan.
+
+**Direct link:** [Data Retention Settings](https://portal.azure.com/#@ZevigoSolutions728.onmicrosoft.com/resource/subscriptions/3d06e7d1-0ef1-45d9-ab16-6fdd37a8ac1f/resourceGroups/zevigo-synapse-cqna/providers/Microsoft.OperationalInsights/workspaces/zevigo-synapse-cqna-log-analytics/usageAndCosts)
+
+---
+
+## Quick Links
+
+| Resource | Link |
+|----------|------|
+| Certificates & Secrets | [LogAnalyticsReader App](https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Credentials/appId/70f438b0-f78d-438d-a5f4-f611578251bf/isMSAApp~/false) |
+| Data Retention | [Usage and estimated costs](https://portal.azure.com/#@ZevigoSolutions728.onmicrosoft.com/resource/subscriptions/3d06e7d1-0ef1-45d9-ab16-6fdd37a8ac1f/resourceGroups/zevigo-synapse-cqna/providers/Microsoft.OperationalInsights/workspaces/zevigo-synapse-cqna-log-analytics/usageAndCosts) |
+| Log Analytics Workspace | [zevigo-synapse-cqna-log-analytics](https://portal.azure.com/#@ZevigoSolutions728.onmicrosoft.com/resource/subscriptions/3d06e7d1-0ef1-45d9-ab16-6fdd37a8ac1f/resourceGroups/zevigo-synapse-cqna/providers/Microsoft.OperationalInsights/workspaces/zevigo-synapse-cqna-log-analytics/overview) |

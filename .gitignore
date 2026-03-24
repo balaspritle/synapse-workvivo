@@ -175,3 +175,4 @@ cython_debug/
 README.md
 logs/*.xlsx
 utility/mail_service.py
+.DS_Store

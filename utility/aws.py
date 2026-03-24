@@ -25,6 +25,10 @@ def split_s3_bucket_key(s3_path):
         s3_path = s3_path[5:]
     return find_bucket_key(s3_path)
 
+def upload_to_s3(filepath, bucket, s3_key):
+    s3_client.upload_file(filepath, bucket, s3_key)
+    print(f"Uploaded {filepath} to s3://{bucket}/{s3_key}")
+
 def download_from_s3(s3_uri):
     bucket, filename = split_s3_bucket_key(s3_uri)
     unique_folder = str(uuid.uuid4())[0:8]
